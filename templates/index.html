@@ -1,21 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
     <title>Database Connection Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            margin-top: 10px;
+        }
+
+        .connection-buttons {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
+
 <body>
     <h1>RecipeBase Connection Status</h1>
-    <h1>Connection Status: {{ connection_status }}</h1>
-    
-    <form method="post">
-        <button name="open_connection" type="submit">Open Connection</button>
-        <button name="close_connection" type="submit">Close Connection</button>
+    <h2>Connection Status: {{ connection_status }}</h2>
+    <p>{{ message }}</p>
+
+    <div class="connection-buttons">
+        <form method="post">
+            <button name="open_connection" type="submit">Open Connection</button>
+            <button name="close_connection" type="submit">Close Connection</button>
+        </form>
+    </div>
+
+    <h3>Add User:</h3>
+<!--    <form method="post" action="{{ url_for('add_user') }}" enctype="multipart/form-data">-->
+    <form action="/add_user" method="post" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Name" required>
+        <input type="email" name="email" placeholder="Email">
+        <input type="file" name="profile_picture" accept="image/*" placeholder="Profile Picture (Max size: 1MB)">
+        <select name="user_type">
+            <option value="Admin">Admin</option>
+            <option value="User" selected>User</option>
+        </select>
+        <input type="submit" value="Add User">
     </form>
 
-    <h2>Delete a User</h2>
+ <h2>Delete a User</h2>
     <form method="post">
         <input type="text" name="username" placeholder="Username">
         <button name="delete_user" type="submit">Delete User</button>
     </form>
+
+
 </body>
+
 </html>
