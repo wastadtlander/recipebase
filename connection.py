@@ -8,8 +8,8 @@ app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # sets max upload size to 1M
 config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '', # <-- ENTER YOUR PASSWORD. DO NOT PUSH WITH PASSWORD.
-    'database': 'recipebase'
+    'password': 'MintySQL', # <-- ENTER YOUR PASSWORD. DO NOT PUSH WITH PASSWORD.
+    'database': 'newrecipe'
 }
 
 connection = None
@@ -210,7 +210,44 @@ def get_image(user_id):
     else:
         return "No image", 404
 
+@app.route('/update_user', methods=['POST'])
+def update_user():
+    user_id = request.form['user_id']
+    name = request.form['name']
+    email = request.form.get('email')
+    profile_picture = request.files['profile_picture']
+    user_type = request.form['user_type']
 
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+
+    placeholders = ["name = %s"]
+    values = [name]
+
+    if email:
+        placeholders.append("Email = %s")
+        values.append(email)
+    else:
+        placeholders.append("Email = %s")
+        values.append(None)
+
+    if profile_picture:
+        placeholders.append("`ProfilePicture` = %s")
+        values.append(profile_picture.read())
+    else:
+        placeholders.append("`ProfilePicture` = %s")
+        values.append(None)
+
+    placeholders.append("`UserType` = %s")
+    values.append(user_type)
+    placeholders_str = ", ".join(placeholders)
+    update_query = f"UPDATE user SET {placeholders_str} WHERE UserID = %s"
+    cursor.execute(update_query, values + [user_id])
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
