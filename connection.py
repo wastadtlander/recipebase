@@ -1,3 +1,4 @@
+from MySQLdb import connections
 from flask import Flask, render_template, request, redirect, url_for
 import mysql.connector
 import uuid
@@ -149,9 +150,11 @@ def index():
                 message = f"User {username} and related data deleted successfully!"
             else:
                 message = "No active connection. Can't delete user."
-
+    #fetch users
+    users = get_users_from_database()
     connection_status = "Connected" if connection else "Not Connected"
-    return render_template('index.html', connection_status=connection_status, message=message)
+    return render_template('index.html', connection_status=connection_status, message=message,users = users)
+
 
 
 
@@ -212,42 +215,65 @@ def get_image(user_id):
 
 @app.route('/update_user', methods=['POST'])
 def update_user():
+    global connection
+    message=""
     user_id = request.form['user_id']
     name = request.form['name']
     email = request.form.get('email')
     profile_picture = request.files['profile_picture']
     user_type = request.form['user_type']
+    if connection:
+        cursor = connection.cursor()
 
-    conn = mysql.connector.connect(**config)
-    cursor = conn.cursor()
+        placeholders = ["name = %s"]
+        values = [name]
 
-    placeholders = ["name = %s"]
-    values = [name]
+        if email:
+            placeholders.append("Email = %s")
+            values.append(email)
+        else:
+            placeholders.append("Email = %s")
+            values.append(None)
 
-    if email:
-        placeholders.append("Email = %s")
-        values.append(email)
+        if profile_picture:
+            placeholders.append("`ProfilePicture` = %s")
+            values.append(profile_picture.read())
+        else:
+            placeholders.append("`ProfilePicture` = %s")
+            values.append(None)
+
+        placeholders.append("`UserType` = %s")
+        values.append(user_type)
+        placeholders_str = ", ".join(placeholders)
+        update_query = f"UPDATE user SET {placeholders_str} WHERE UserID = %s"
+        cursor.execute(update_query, values + [user_id])
+
+        connection.commit()
+        message = 'User updated successfully!'
+        cursor.close()
     else:
-        placeholders.append("Email = %s")
-        values.append(None)
+        message = "No database connection."
 
-    if profile_picture:
-        placeholders.append("`ProfilePicture` = %s")
-        values.append(profile_picture.read())
+    return redirect(url_for('index',message=message))
+
+#grab users for display
+def get_users_from_database():
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM user")
+        users = cursor.fetchall()
+        cursor.close()
+        #print(users)
+        return users
     else:
-        placeholders.append("`ProfilePicture` = %s")
-        values.append(None)
+        return None
 
-    placeholders.append("`UserType` = %s")
-    values.append(user_type)
-    placeholders_str = ", ".join(placeholders)
-    update_query = f"UPDATE user SET {placeholders_str} WHERE UserID = %s"
-    cursor.execute(update_query, values + [user_id])
+#Attempting displayign table on index.html
+@app.route('/update_user_table', methods=['GET'])
+def update_table():
+    users = get_users_from_database()
+    return render_template('user_table_format.html', fetchedUsers=users)
 
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)

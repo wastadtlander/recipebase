@@ -24,35 +24,35 @@
 </head>
 
 <body>
-    <h1>RecipeBase Connection Status</h1>
-    <h2>Connection Status: {{ connection_status }}</h2>
-    <p>{{ message }}</p>
+<h1>RecipeBase Connection Status</h1>
+<h2>Connection Status: {{ connection_status }}</h2>
+<p>{{ message }}</p>
 
-    <div class="connection-buttons">
-        <form method="post">
-            <button name="open_connection" type="submit">Open Connection</button>
-            <button name="close_connection" type="submit">Close Connection</button>
-        </form>
-    </div>
-
-    <h3>Add User:</h3>
-<!--    <form method="post" action="{{ url_for('add_user') }}" enctype="multipart/form-data">-->
-    <form action="/add_user" method="post" enctype="multipart/form-data">
-        <input type="text" name="name" placeholder="Name" required>
-        <input type="email" name="email" placeholder="Email">
-        <input type="file" name="profile_picture" accept="image/*" placeholder="Profile Picture (Max size: 1MB)">
-        <select name="user_type">
-            <option value="Admin">Admin</option>
-            <option value="User" selected>User</option>
-        </select>
-        <input type="submit" value="Add User">
-    </form>
-
- <h2>Delete a User</h2>
+<div class="connection-buttons">
     <form method="post">
-        <input type="text" name="username" placeholder="Username">
-        <button name="delete_user" type="submit">Delete User</button>
+        <button name="open_connection" type="submit">Open Connection</button>
+        <button name="close_connection" type="submit">Close Connection</button>
     </form>
+</div>
+
+<h3>Add User:</h3>
+<!--    <form method="post" action="{{ url_for('add_user') }}" enctype="multipart/form-data">-->
+<form action="/add_user" method="post" enctype="multipart/form-data">
+    <input type="text" name="name" placeholder="Name" required>
+    <input type="email" name="email" placeholder="Email">
+    <input type="file" name="profile_picture" accept="image/*" placeholder="Profile Picture (Max size: 1MB)">
+    <select name="user_type">
+        <option value="Admin">Admin</option>
+        <option value="User" selected>User</option>
+    </select>
+    <input type="submit" value="Add User">
+</form>
+
+<h2>Delete a User</h2>
+<form method="post">
+    <input type="text" name="username" placeholder="Username">
+    <button name="delete_user" type="submit">Delete User</button>
+</form>
 
 <h2>Update User</h2>
 <form action="/update_user" method="post" enctype="multipart/form-data">
@@ -76,6 +76,32 @@
 
     <input type="submit" value="Update User">
 </form>
+
+<div id="userTableContainer">
+    {% include 'user_table_format.html' %}
+</div>
+
 </body>
 
 </html>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function updateUserTable() {
+        $.ajax({
+            url: '/update_user_table',
+            type: 'GET',
+            success: function (data) {
+                $('#userTableContainer').html(data);
+            }
+        });
+    }
+
+    // Call updateTable function on page load
+    $(document).ready(function () {
+        updateUserTable();
+    });
+
+
+</script>

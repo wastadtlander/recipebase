@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <table border="1" id="userTable">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>PFP</th>
+            <th>User Type</th>
+            <th>User ID</th>
+        </tr>
+        {% if fetchedUsers is not none %}
+            {% for currUser in fetchedUsers %}
+                <tr>
+                    <td>{{ currUser.Name }}</td>
+                    <td>{{ currUser.Email }}</td>
+                    <td>{{ currUser.ProfilePicture }}</td> <!-- maybe img later? depends on implementation-->
+                    <td>{{ currUser.UserType }}</td>
+                    <td>{{ currUser.UserID }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</head>
+<body>
+
+</body>
+</html>
