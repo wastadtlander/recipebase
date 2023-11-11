@@ -9,7 +9,7 @@ app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # sets max upload size to 1M
 config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'XXXXXX', # <-- ENTER YOUR PASSWORD. DO NOT PUSH WITH PASSWORD.
+    'password': 'XXXXX', # <-- ENTER YOUR PASSWORD. DO NOT PUSH WITH PASSWORD.
     'database': 'newrecipe'
 }
 
@@ -285,8 +285,8 @@ def update_table():
 #Viewing individual recipes and related comments.
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
-    recipeData, commentsData = get_recipe_and_comments(connection, recipe_id)
-    return render_template('single_recipe.html', recipeData=recipeData, commentsData=commentsData)
+    recipeData, commentsData, imageData = get_recipe_and_comments(connection, recipe_id)
+    return render_template('single_recipe.html', recipeData=recipeData, commentsData=commentsData, imageData=imageData)
 def get_recipe_and_comments(connection, recipeID):
 
     cursor = connection.cursor(dictionary=True)
@@ -301,7 +301,13 @@ def get_recipe_and_comments(connection, recipeID):
     commentsInfo = cursor.fetchall()
     cursor.close()
 
-    return recipeInfo, commentsInfo
+    cursor = connection.cursor(dictionary=True)
+    comments_query = "SELECT * FROM recipeimage WHERE RecipeID = %s"
+    cursor.execute(comments_query, (recipeID,))
+    imagesInfo = cursor.fetchall()
+    cursor.close()
+
+    return recipeInfo, commentsInfo, imagesInfo
 
 #Routes for nav bar:
 @app.route('/go_to_recipe_page')

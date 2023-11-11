@@ -22,6 +22,19 @@
         <p>No comments available for this recipe.</p>
     {% endif %}
 </div>
+
+<div>
+    <h2>Images</h2>
+    {% if imageData %}
+        <ul>
+            {% for image in imageData %}
+                <li>{{ image.Image }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No images avaliable for this recipe</p>
+    {% endif %}
+</div>
 <body>
 
 </body>
