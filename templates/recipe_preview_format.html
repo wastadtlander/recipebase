@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<table border="1" id="recipePreviewTable">
+        <tr>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Text</th>
+            <th>RecipeID</th>
+            <th>UserID</th>
+        </tr>
+        {% if fetchedRecipes is not none %}
+            {% for currRecipe in fetchedRecipes %}
+                <tr>
+                    <td>{{ currRecipe.Title}}</td>
+                    <td>{{ currRecipe.Type }}</td>
+                    <td>{{ currRecipe.Text[:100] + '...' if currRecipe.Text|length > 100 else currRecipe.Text }}</td>
+                    <td>{{ currRecipe.RecipeID }}</td>
+                    <td>{{ currRecipe.UserID }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+<body>
+
+</body>
+</html>

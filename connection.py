@@ -267,13 +267,30 @@ def get_users_from_database():
         return users
     else:
         return None
-
+def get_recipes_from_database():
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM recipe")
+        recipes = cursor.fetchall()
+        cursor.close()
+        return recipes
+    else:
+        return None
 #Attempting displayign table on index.html
 @app.route('/update_user_table', methods=['GET'])
 def update_table():
     users = get_users_from_database()
     return render_template('user_table_format.html', fetchedUsers=users)
 
+#Routes for nav bar:
+@app.route('/go_to_recipe_page')
+def go_to_recipe_page():
+    recipes = get_recipes_from_database()
+    return render_template('recipe_page.html', fetchedRecipes= recipes)
+@app.route('/go_to_index')
+def go_to_index():
+    message = check_connection_status()
+    return redirect(url_for('index', message=message))
 
 if __name__ == '__main__':
     app.run(debug=True)

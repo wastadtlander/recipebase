@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <title>Database Connection Status</title>
     <style>
@@ -24,6 +23,7 @@
 </head>
 
 <body>
+{% include 'navbar.html' %}
 <h1>RecipeBase Connection Status</h1>
 <h2>Connection Status: {{ connection_status }}</h2>
 <p>{{ message }}</p>
