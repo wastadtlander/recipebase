@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<table border="1" id="recipePreviewTable">
+<head>
+    <style>
+        table tr:not(:first-child):hover {
+            background-color: #c0c0c0; /* Change this color to the desired hover color */
+        }
+    </style>
+</head>
+<body>
+    <table border="1" id="recipePreviewTable">
         <tr>
             <th>Title</th>
             <th>Type</th>
@@ -10,7 +18,7 @@
         </tr>
         {% if fetchedRecipes is not none %}
             {% for currRecipe in fetchedRecipes %}
-                <tr>
+                <tr onclick="window.location.href='{{ url_for('view_recipe', recipe_id=currRecipe.RecipeID) }}';" style="cursor: pointer;">
                     <td>{{ currRecipe.Title}}</td>
                     <td>{{ currRecipe.Type }}</td>
                     <td>{{ currRecipe.Text[:100] + '...' if currRecipe.Text|length > 100 else currRecipe.Text }}</td>
@@ -20,7 +28,5 @@
             {% endfor %}
         {% endif %}
     </table>
-<body>
-
 </body>
 </html>

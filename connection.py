@@ -9,7 +9,7 @@ app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # sets max upload size to 1M
 config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'MintySQL', # <-- ENTER YOUR PASSWORD. DO NOT PUSH WITH PASSWORD.
+    'password': 'XXXXXX', # <-- ENTER YOUR PASSWORD. DO NOT PUSH WITH PASSWORD.
     'database': 'newrecipe'
 }
 
@@ -281,6 +281,27 @@ def get_recipes_from_database():
 def update_table():
     users = get_users_from_database()
     return render_template('user_table_format.html', fetchedUsers=users)
+
+#Viewing individual recipes and related comments.
+@app.route('/view_recipe/<recipe_id>')
+def view_recipe(recipe_id):
+    recipeData, commentsData = get_recipe_and_comments(connection, recipe_id)
+    return render_template('single_recipe.html', recipeData=recipeData, commentsData=commentsData)
+def get_recipe_and_comments(connection, recipeID):
+
+    cursor = connection.cursor(dictionary=True)
+    recipe_query = "SELECT * FROM recipe WHERE RecipeID = %s"
+    cursor.execute(recipe_query, (recipeID,))
+    recipeInfo = cursor.fetchall()
+    cursor.close()
+
+    cursor = connection.cursor(dictionary=True)
+    comments_query = "SELECT * FROM comments WHERE Recipe = %s"
+    cursor.execute(comments_query, (recipeID,))
+    commentsInfo = cursor.fetchall()
+    cursor.close()
+
+    return recipeInfo, commentsInfo
 
 #Routes for nav bar:
 @app.route('/go_to_recipe_page')

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<table border="1" id="recipePreviewTable">
+{% include 'navbar.html' %}
+<div>
+    <h1>{{ recipeData[0].Title }}</h1>
+    <p>Type: {{ recipeData[0].Type }}</p>
+    <p>Text: {{ recipeData[0].Text }}</p>
+    <p>RecipeID: {{ recipeData[0].RecipeID }}</p>
+    <p>UserID: {{ recipeData[0].UserID }}</p>
+</div>
+
+<div>
+    <h2>Comments</h2>
+    {% if commentsData %}
+        <ul>
+            {% for comment in commentsData %}
+                <li>{{ comment.Body }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by {{ comment.UserID }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No comments available for this recipe.</p>
+    {% endif %}
+</div>
+<body>
+
+</body>
+</html>
