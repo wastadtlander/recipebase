@@ -1,15 +1,16 @@
 from MySQLdb import connections
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import mysql.connector
 import uuid
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # sets max upload size to 1MB
+app.config['SECRET_KEY'] = 'requiredKeyToStoreDataInSession'
 
 config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'XXXXX', # <-- ENTER YOUR PASSWORD. DO NOT PUSH WITH PASSWORD.
+    'password': 'MintySQL', # <-- ENTER YOUR PASSWORD. DO NOT PUSH WITH PASSWORD.
     'database': 'newrecipe'
 }
 
@@ -285,9 +286,9 @@ def update_table():
 #Viewing individual recipes and related comments.
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
-    recipeData, commentsData, imageData = get_recipe_and_comments(connection, recipe_id)
-    return render_template('single_recipe.html', recipeData=recipeData, commentsData=commentsData, imageData=imageData)
-def get_recipe_and_comments(connection, recipeID):
+    recipeData, commentsData, imageData, ratingData = get_single_recipe_info(connection, recipe_id)
+    return render_template('single_recipe.html', recipeData=recipeData, commentsData=commentsData, imageData=imageData, ratingData=ratingData)
+def get_single_recipe_info(connection, recipeID):
 
     cursor = connection.cursor(dictionary=True)
     recipe_query = "SELECT * FROM recipe WHERE RecipeID = %s"
@@ -307,7 +308,13 @@ def get_recipe_and_comments(connection, recipeID):
     imagesInfo = cursor.fetchall()
     cursor.close()
 
-    return recipeInfo, commentsInfo, imagesInfo
+    cursor = connection.cursor(dictionary=True)
+    comments_query = "SELECT * FROM rating WHERE RecipeID = %s"
+    cursor.execute(comments_query, (recipeID,))
+    ratingsInfo = cursor.fetchall()
+    cursor.close()
+
+    return recipeInfo, commentsInfo, imagesInfo, ratingsInfo
 
 #Routes for nav bar:
 @app.route('/go_to_recipe_page')
@@ -318,6 +325,30 @@ def go_to_recipe_page():
 def go_to_index():
     message = check_connection_status()
     return redirect(url_for('index', message=message))
+@app.route('/go_to_login_page')
+def go_to_login_page():
+    return render_template('login_page.html')
+
+#login as a user via UUID
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        user_id= request.form.get('user_id_form')
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM user WHERE UserID = %s", (user_id,))
+        user = cursor.fetchone()
+        cursor.close()
+
+        if user:
+            username = user['Name']
+            loginStatus = f"Login successful. Welcome, {username}!"
+            session['currUser'] = user
+        else:
+            loginStatus = "Login failed. UserID not found."
+
+        return render_template('login_page.html', login_status=loginStatus)
+
+    return render_template('login_page.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

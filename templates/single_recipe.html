@@ -9,7 +9,18 @@
     <p>RecipeID: {{ recipeData[0].RecipeID }}</p>
     <p>UserID: {{ recipeData[0].UserID }}</p>
 </div>
-
+<div>
+    <h2>Ratings</h2>
+    {% if ratingData %}
+        <ul>
+            {% for rating in ratingData %}
+                <li>{{ rating.Value }}<br>by {{ rating.UserID }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No ratings avaliable for this recipe</p>
+    {% endif %}
+</div>
 <div>
     <h2>Comments</h2>
     {% if commentsData %}
@@ -35,6 +46,7 @@
         <p>No images avaliable for this recipe</p>
     {% endif %}
 </div>
+
 <body>
 
 </body>

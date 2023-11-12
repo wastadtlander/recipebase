@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login Page</title>
+</head>
+<body>
+{% include 'navbar.html' %}
+
+    <h1>Login</h1>
+    <form method="post" action="{{ url_for('login') }}">
+        <label for="user_id_form">UserID:</label>
+        <input type="text" id="user_id_form" name="user_id_form" required>
+        <br>
+        <input type="submit" value="Login">
+    </form>
+
+    {% if login_status %}
+        <p>{{ login_status }}</p>
+    {% endif %}
+</body>
+</html>
