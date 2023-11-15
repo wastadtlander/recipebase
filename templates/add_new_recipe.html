@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'navbar.html' %}
+    <meta charset="UTF-8">
+    <title>Add Recipe</title>
+</head>
+
+<body>
+    <h1>Add Your Recipe</h1>
+    <form action="{{ url_for('add_recipe') }}" method="post" enctype="multipart/form-data">
+    <label for="title">Recipe Title:</label>
+    <input type="text" id="title" name="title" required><br><br>
+
+    <label for="type">Recipe Type:</label>
+    <select id="type" name="type" required>
+        <option value="Asian">Asian</option>
+        <option value="Italian">Italian</option>
+        <option value="Other">Other</option>
+    </select><br><br>
+
+    <label for="text">Recipe Text:</label>
+    <textarea id="text" name="text" rows="4" cols="50" required></textarea><br><br>
+
+    <label for="images">Recipe Images:</label>
+    <input type="file" id="images" name="images" accept="image/*" multiple><br><br>
+
+    <input type="submit" value="Submit">
+</form>
+
+    {% if message %}
+    <p>{{ message }}</p>
+    {% endif %}
+
+    <!-- Include a link back to the main page or other appropriate navigation -->
+    <a href="{{ url_for('index') }}">Back to home</a>
+</body>
+
+</html>

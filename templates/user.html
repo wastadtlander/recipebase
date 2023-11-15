@@ -1,0 +1,77 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>User Management</title>-->
+<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
+<!--</head>-->
+<!--<body>-->
+<!--    <div class="container mt-5">-->
+<!--        <h1 class="text-center">Manage User</h1>-->
+
+<!--        &lt;!&ndash; Display User &ndash;&gt;-->
+<!--        <table class="table table-bordered mt-4">-->
+<!--            <thead>-->
+<!--                <tr>-->
+<!--                    <th>Name</th>-->
+<!--                    <th>Email</th>-->
+<!--                    <th>User Type</th>-->
+<!--                    <th>Actions</th>-->
+<!--                </tr>-->
+<!--            </thead>-->
+<!--            <tbody>-->
+<!--                {% for user in user %}-->
+<!--                <tr>-->
+<!--                    <td>{{ user.Name }}</td>-->
+<!--                    <td>{{ user.Email }}</td>-->
+<!--                    <td>{{ user.User_Type }}</td>-->
+<!--                    <td>-->
+<!--                        &lt;!&ndash; Add buttons for Update and Delete operations &ndash;&gt;-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                {% endfor %}-->
+<!--            </tbody>-->
+<!--        </table>-->
+
+<!--        &lt;!&ndash; Form to Add a New User &ndash;&gt;-->
+<!--        <div class="mt-5">-->
+<!--            <h3>Add New User</h3>-->
+<!--            <form method="post" action="/add_user">-->
+<!--                &lt;!&ndash; Input field for Name &ndash;&gt;-->
+<!--                <div class="form-group">-->
+<!--                    <label for="name">Name:</label>-->
+<!--                    <input type="text" class="form-control" name="Name" id="name" required>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Input field for Email &ndash;&gt;-->
+<!--                <div class="form-group">-->
+<!--                    <label for="email">Email:</label>-->
+<!--                    <input type="email" class="form-control" name="Email" id="email" required>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Input field for User Type &ndash;&gt;-->
+<!--                <div class="form-group">-->
+<!--                    <label for="userType">User Type:</label>-->
+<!--                    <select class="form-control" name="User_Type" id="userType" required>-->
+<!--                        <option value="admin">Admin</option>-->
+<!--                        <option value="user">User</option>-->
+<!--                        &lt;!&ndash; Add other user types if necessary &ndash;&gt;-->
+<!--                    </select>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Input field for Profile Picture (assuming it's a file upload) &ndash;&gt;-->
+<!--                <div class="form-group">-->
+<!--                    <label for="profilePicture">Profile Picture:</label>-->
+<!--                    <input type="file" class="form-control-file" name="Profile_Picture" id="profilePicture">-->
+<!--                </div>-->
+
+<!--                <button type="submit" class="btn btn-primary">Add User</button>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</body>-->
+<!--</html>-->
+
+

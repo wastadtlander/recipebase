@@ -1,3 +1,31 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <title>Login Page</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--{% include 'navbar.html' %}-->
+
+<!--<h1>Login</h1>-->
+<!--    <form method="post" action="{{ url_for('login') }}">-->
+<!--        <label for="user_email_form">UserID:</label>-->
+<!--        <input type="text" id="user_email_form" name="user_email_form" placeholder="Enter your email"  required>-->
+<!--        <br>-->
+<!--        <input type="submit" value="Login">-->
+<!--    </form>-->
+
+<!--{% if login_status %}-->
+<!--<p>{{ login_status }}</p>-->
+<!--{% endif %}-->
+
+<!--{% if current_user.is_authenticated %}-->
+<!--    <p>Hello, {{ current_user.name }}!</p>-->
+<!--{% else %}-->
+<!--    <p>Hello, Guest!</p>-->
+<!--{% endif %}-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,16 +34,23 @@
 <body>
 {% include 'navbar.html' %}
 
+{% if current_user.is_authenticated %}
+    <h1>Welcome, {{ current_user.name }}!</h1>
+    <form action="{{ url_for('logout') }}" method="post">
+        <input type="submit" value="Logout">
+    </form>
+{% else %}
     <h1>Login</h1>
     <form method="post" action="{{ url_for('login') }}">
-        <label for="user_id_form">UserID:</label>
-        <input type="text" id="user_id_form" name="user_id_form" required>
+        <label for="user_email_form">Email:</label>
+        <input type="text" id="user_email_form" name="user_email_form" placeholder="Enter your email" required>
         <br>
         <input type="submit" value="Login">
     </form>
 
     {% if login_status %}
-        <p>{{ login_status }}</p>
+    <p>{{ login_status }}</p>
     {% endif %}
+{% endif %}
 </body>
 </html>

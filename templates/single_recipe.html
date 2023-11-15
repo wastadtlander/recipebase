@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<table border="1" id="recipePreviewTable">
+<table border="1" id="recipePreviewTable"/>
 {% include 'navbar.html' %}
 <div>
     <h1>{{ recipeData[0].Title }}</h1>
@@ -33,20 +33,18 @@
         <p>No comments available for this recipe.</p>
     {% endif %}
 </div>
-
 <div>
     <h2>Images</h2>
     {% if imageData %}
         <ul>
             {% for image in imageData %}
-                <li>{{ image.Image }}</li>
+                <li><img src="{{ url_for('get_recipe_image', image_id=image.ImageID) }}" alt="Recipe Image"></li>
             {% endfor %}
         </ul>
     {% else %}
-        <p>No images avaliable for this recipe</p>
+        <p>No images available for this recipe</p>
     {% endif %}
 </div>
-
 <body>
 
 </body>
