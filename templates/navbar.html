@@ -29,7 +29,7 @@
         nav a:hover {
             background-color: #ddd;
         }
-        nav #login-btn {
+        nav #login-btn, #user-name, #logout-btn{
             float: right;
         }
     </style>
@@ -40,7 +40,12 @@
             <li><a href="{{ url_for('go_to_index') }}">Edit A User</a></li>
             <li><a href="{{ url_for('go_to_recipe_page') }}">Recipe Page</a></li>
             <li><a href="{{ url_for('add_recipe') }}">Add New Recipe</a></li>
-            <li id="login-btn"><a href="{{ url_for('go_to_login_page') }}">Login</a></li>
+            {% if current_user.is_authenticated %}
+                <li id="user-name"><a href="{{ url_for('go_to_user_page') }}"> Welcome, {{ current_user.name }}</a></li>
+                <li id="logout-btn"><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li id="login-btn"><a href="{{ url_for('go_to_login_page') }}">Login</a></li>
+            {% endif %}
         </ul>
     </nav>
 </body>

@@ -18,19 +18,21 @@ connection = None
 
 class User(UserMixin):
     # Assuming you have a User class for your user model
-    def __init__(self, id, name, email):
+    def __init__(self, id, name, email, user_type):
         self.id = id
         self.name = name
         self.email = email
+        self.user_type = user_type
 
     def get_id(self):
         return self.id
     # pass
 
 def get_db_connection():
-    if 'db_conn' not in g:
-        g.db_conn = create_database_connection()
-    return g.db_conn
+    global connection
+    if connection is None or not connection.is_connected():
+        connection = create_database_connection()
+    return connection
 
 
 def create_database_connection():
@@ -178,6 +180,28 @@ def add_user():
     connection_status = "Connected" if connection else "Not Connected"
     # return render_template('add_user.html', message=message, connection_status=connection_status)
     return redirect(url_for('index', message=message))
+
+
+@app.route('/remove_recipe/<recipe_id>', methods=['POST'])
+@login_required
+def remove_recipe(recipe_id):
+    # if current_user.user_type != 'Admin':
+    #     flash('You do not have permission to remove recipes.')
+    #     return redirect(url_for('go_to_user_page'))
+
+    # Assuming you have a connection to your database
+    cursor = connection.cursor()
+    try:
+        # Delete the recipe from the database
+        cursor.execute("DELETE FROM recipe WHERE RecipeID = %s", (recipe_id,))
+        connection.commit()
+        flash('Recipe removed successfully.')
+    except Exception as e:
+        flash('Error removing recipe: ' + str(e))
+    finally:
+        cursor.close()
+
+    return redirect(url_for('go_to_user_page'))
 
 
 @app.route('/get_image/<int:user_id>')
@@ -421,6 +445,19 @@ def go_to_index():
 def go_to_login_page():
     return render_template('login_page.html')
 
+@app.route('/user_page')
+@login_required
+def go_to_user_page():
+    user_id = current_user.get_id()
+    cursor = connection.cursor(dictionary=True)
+
+    # Query to fetch user's recipes
+    cursor.execute("SELECT * FROM recipe WHERE UserID = %s", (user_id,))
+    user_recipes = cursor.fetchall()
+    cursor.close()
+
+    return render_template('user_page.html', user=current_user, recipes=user_recipes)
+
 
 # login as a user via UUID
 @app.route('/login', methods=['POST'])
@@ -435,7 +472,7 @@ def login():
         if user:
             username = user['Name']
             # session['currUser'] = user
-            user_data = User(user['UserID'], user['Name'], user['Email'])
+            user_data = User(user['UserID'], user['Name'], user['Email'], user['UserType'])
             login_user(user_data)
             loginStatus = f"Login successful. Welcome, {username}!"
         else:
@@ -458,10 +495,9 @@ def load_user(user_id):
         user_data = cursor.fetchone()
         cursor.close()
         if user_data:
-            return User(user_data['UserID'], user_data['Name'], user_data['Email'])
+            return User(user_data['UserID'], user_data['Name'], user_data['Email'], user_data['UserType'])
         return None
     else:
-        # Handle the case where the connection could not be established
         print("Database connection could not be established.")
         return None
 
