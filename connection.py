@@ -182,7 +182,7 @@ def add_user():
     return redirect(url_for('index', message=message))
 
 # Adding a comment to a recipe
-@app.route('/add_comment', methods=['GET', 'POST'])
+@app.route('/add_comment', methods=['POST'])
 @login_required
 def add_comment():
     if request.method == 'POST':
@@ -195,6 +195,8 @@ def add_comment():
         # User ID
         user_id = current_user.get_id()
 
+        # Comment ID
+        comment_id = str(uuid.uuid4())
 
         cursor = connection.cursor()
         if connection:
@@ -202,9 +204,9 @@ def add_comment():
             try:
                 # Insert comment data
                 insert_recipe_query = (
-                    'INSERT INTO comments (Body, UserID, Recipe) VALUES (%s, %s, %s)'
+                    'INSERT INTO comments (CommentID, Body, UserID, Recipe) VALUES (%s, %s, %s, %s)'
                 )
-                cursor.execute(insert_recipe_query, (text, user_id, recipe_id))
+                cursor.execute(insert_recipe_query, (comment_id, text, user_id, recipe_id))
 
                 connection.commit()
                 flash('Commment added successfully!')
@@ -233,6 +235,23 @@ def remove_recipe(recipe_id):
     try:
         # Delete the recipe from the database
         cursor.execute("DELETE FROM recipe WHERE RecipeID = %s", (recipe_id,))
+        connection.commit()
+        flash('Recipe removed successfully.')
+    except Exception as e:
+        flash('Error removing recipe: ' + str(e))
+    finally:
+        cursor.close()
+
+    return redirect(url_for('go_to_user_page'))
+
+@app.route('/remove_comment/<comment_id>', methods=['POST'])
+@login_required
+def remove_comment(comment_id):
+    # Assuming you have a connection to your database
+    cursor = connection.cursor()
+    try:
+        # Delete the recipe from the database
+        cursor.execute("DELETE FROM comments WHERE CommentID = %s", (comment_id,))
         connection.commit()
         flash('Recipe removed successfully.')
     except Exception as e:
@@ -493,9 +512,13 @@ def go_to_user_page():
     # Query to fetch user's recipes
     cursor.execute("SELECT * FROM recipe WHERE UserID = %s", (user_id,))
     user_recipes = cursor.fetchall()
+
+    # Query to fetch user's recipes
+    cursor.execute("SELECT * FROM comments WHERE UserID = %s", (user_id,))
+    user_comments = cursor.fetchall()
     cursor.close()
 
-    return render_template('user_page.html', user=current_user, recipes=user_recipes)
+    return render_template('user_page.html', user=current_user, recipes=user_recipes, comments=user_comments)
 
 
 # login as a user via UUID
