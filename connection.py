@@ -181,6 +181,45 @@ def add_user():
     # return render_template('add_user.html', message=message, connection_status=connection_status)
     return redirect(url_for('index', message=message))
 
+# Adding a comment to a recipe
+@app.route('/add_comment', methods=['GET', 'POST'])
+@login_required
+def add_comment():
+    if request.method == 'POST':
+        # Form data
+        text = request.form['text']
+
+        # Recipe ID
+        recipe_id = request.form['recipe_id']
+
+        # User ID
+        user_id = current_user.get_id()
+
+
+        cursor = connection.cursor()
+        if connection:
+            cursor = connection.cursor()
+            try:
+                # Insert comment data
+                insert_recipe_query = (
+                    'INSERT INTO comments (Body, UserID, Recipe) VALUES (%s, %s, %s)'
+                )
+                cursor.execute(insert_recipe_query, (text, user_id, recipe_id))
+
+                connection.commit()
+                flash('Commment added successfully!')
+            except mysql.connector.Error as err:
+                connection.rollback()
+                flash('An error occurred: ' + str(err))
+            finally:
+                cursor.close()
+        else:
+            flash('Database connection not established.')
+
+        return redirect(url_for('view_recipe', recipe_id=recipe_id))
+    else:
+        return None
+
 
 @app.route('/remove_recipe/<recipe_id>', methods=['POST'])
 @login_required

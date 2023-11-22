@@ -1,5 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
+<head>
+    <style>
+        .add-comment-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: rgb(3, 3, 3);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        /* Add more styles as needed */
+    </style>
+</head>
 <table border="1" id="recipePreviewTable"/>
 {% include 'navbar.html' %}
 <div>
@@ -32,6 +50,14 @@
     {% else %}
         <p>No comments available for this recipe.</p>
     {% endif %}
+    <form action="/add_comment" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="recipe_id" value="{{ recipeData[0].RecipeID }}">
+        <label for="text">New Comment</label>
+        <br></br>
+        <textarea id="text" name="text" rows="4" cols="50" required></textarea><br><br>
+        
+        <input type="submit" value="Submit">
+    </form>
 </div>
 <div>
     <h2>Images</h2>
