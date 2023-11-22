@@ -7,18 +7,20 @@ SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 DROP TABLE IF EXISTS `Comments`;
 CREATE TABLE `Comments` (
+  `CommentID` varchar(36) NOT NULL,
   `Body` varchar(10000) NOT NULL,
   `UserID` varchar(36) NOT NULL,
   `Recipe` varchar(36) NOT NULL,
+  PRIMARY KEY (`CommentID`),
   KEY `UserID` (`UserID`),
   KEY `Recipe` (`Recipe`),
   CONSTRAINT `Comments_ibfk_7` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `Comments_ibfk_9` FOREIGN KEY (`Recipe`) REFERENCES `Recipe` (`RecipeID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `Comments` (`Body`, `UserID`, `Recipe`) VALUES
-('I love this recipe for your waffles in 2023 :)',	'2382da03-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac'),
-('I also love this recipe for waffles in 2023!',	'1798bce1-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac');
+INSERT INTO `Comments` (`CommentID`, `Body`, `UserID`, `Recipe`) VALUES
+('4444da03-6eed-11ee-95c4-96fc48e250qe', 'I love this recipe for your waffles in 2023 :)',	'2382da03-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac'),
+('8734bh03-6eed-11ee-95c8-96fg68e250ac', 'I also love this recipe for waffles in 2023!',	'1798bce1-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac');
 
 DROP TABLE IF EXISTS `Rating`;
 CREATE TABLE `Rating` (
@@ -91,12 +93,12 @@ CREATE TABLE `User` (
   `Name` varchar(64) NOT NULL,
   `Email` varchar(255) DEFAULT NULL,
   `Profile Picture` binary(1) DEFAULT NULL,
-  `User Type` enum('Admin','User') NOT NULL,
+  `UserType` enum('Admin','User') NOT NULL,
   `UserID` varchar(36) NOT NULL,
   PRIMARY KEY (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `User` (`Name`, `Email`, `Profile Picture`, `User Type`, `UserID`) VALUES
+INSERT INTO `User` (`Name`, `Email`, `Profile Picture`, `UserType`, `UserID`) VALUES
 ('real paul rudd',	'paulruddofficial@gmail.com',	NULL,	'User',	'03057324-6eee-11ee-95c8-96fc48e250ac'),
 ('MinecraftCreeper55',	'joshsandman@hotmail.com',	NULL,	'User',	'09112b8c-6eed-11ee-95c8-96fc48e250ac'),
 ('Zarina',	'zarinamyers01@gmail.com',	NULL,	'User',	'153cc18b-6eee-11ee-95c8-96fc48e250ac'),

@@ -55,5 +55,36 @@
             </tbody>
         </table>
     </div>
+
+    <div class="container mt-5">
+        <h1 class="text-center">Manage Comments</h1>
+
+        <!-- Display Comments -->
+        <table class="table table-bordered mt-4">
+            <thead>
+                <tr>
+                    <th>Comment ID</th>
+                    <th>Text</th>
+                    <th>Recipe</th>
+                    <th>User ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in comments %}
+                <tr>
+                    <td>{{ comment.CommentID }}</td>
+                    <td>{{ comment.Text }}</td>
+                    <td>{{ comment.Recipe }}</td>
+                    <td>{{ comment.UserID }}</td>
+                    <td>
+                        <form action="{{ url_for('remove_comment', comment_id=comment.CommentID) }}" method="post">
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
