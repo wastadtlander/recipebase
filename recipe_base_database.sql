@@ -25,19 +25,18 @@ INSERT INTO `Comments` (`CommentID`, `Body`, `UserID`, `Recipe`) VALUES
 DROP TABLE IF EXISTS `Rating`;
 CREATE TABLE `Rating` (
   `Value` tinyint(1) NOT NULL,
-  `RatingID` varchar(36) NOT NULL,
   `UserID` varchar(36) NOT NULL,
   `RecipeID` varchar(36) NOT NULL,
-  PRIMARY KEY (`RatingID`),
+  PRIMARY KEY (`UserID`, `RecipeID`),
   KEY `UserID` (`UserID`),
   KEY `RecipeID` (`RecipeID`),
   CONSTRAINT `Rating_ibfk_10` FOREIGN KEY (`RecipeID`) REFERENCES `Recipe` (`RecipeID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `Rating_ibfk_8` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `Rating` (`Value`, `RatingID`, `UserID`, `RecipeID`) VALUES
-(5,	'7cd7f8fc-6f00-11ee-95c8-96fc48e250ac',	'2382da03-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac'),
-(4,	'91f8f686-6f00-11ee-95c8-96fc48e250ac',	'1798bce1-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac');
+INSERT INTO `Rating` (`Value`, `UserID`, `RecipeID`) VALUES
+(5,	'2382da03-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac'),
+(4,	'1798bce1-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac');
 
 DROP TABLE IF EXISTS `Recipe`;
 CREATE TABLE `Recipe` (

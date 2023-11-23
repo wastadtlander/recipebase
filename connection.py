@@ -181,6 +181,45 @@ def add_user():
     # return render_template('add_user.html', message=message, connection_status=connection_status)
     return redirect(url_for('index', message=message))
 
+# Rating a recipe
+@app.route('/rate_recipe', methods=['POST'])
+@login_required
+def rate_recipe(): 
+    if request.method == 'POST':
+        # User ID
+        user_id = current_user.get_id()
+
+        # Selected Rating
+        rating = request.form['rating']
+
+        # Recipe ID
+        recipe_id = request.form['recipe_id']
+
+        cursor = connection.cursor()
+        if connection:
+            cursor = connection.cursor()
+            try:
+                # Insert rating data
+                insert_rating_query = (
+                    '''INSERT INTO rating (RecipeID, UserID, Value) VALUES (%s, %s, %s) 
+                    ON DUPLICATE KEY UPDATE Value = VALUES(Value);'''
+                )
+                cursor.execute(insert_rating_query, (recipe_id, user_id, rating))
+
+                connection.commit()
+                flash('Rating added successfully!')
+            except mysql.connector.Error as err:
+                connection.rollback()
+                flash('An error occurred: ' + str(err))
+            finally:
+                cursor.close()
+        else:
+            flash('Database connection not established.')
+
+        return redirect(url_for('view_recipe', recipe_id=recipe_id))
+    else:
+        return None
+
 # Adding a comment to a recipe
 @app.route('/add_comment', methods=['POST'])
 @login_required
@@ -454,8 +493,14 @@ def update_table():
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
     recipeData, commentsData, imageData, ratingData = get_single_recipe_info(connection, recipe_id)
+
+    # Calculate average rating
+    total_ratings = len(ratingData)
+    sum_ratings = sum([rating['Value'] for rating in ratingData]) if total_ratings > 0 else 0
+    averageRating = sum_ratings / total_ratings if total_ratings > 0 else 0
+
     return render_template('single_recipe.html', recipeData=recipeData, commentsData=commentsData, imageData=imageData,
-                           ratingData=ratingData)
+                           ratingData=ratingData, averageRating=averageRating)
 
 
 def get_single_recipe_info(connection, recipeID):
