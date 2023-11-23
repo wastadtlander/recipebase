@@ -454,8 +454,14 @@ def update_table():
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
     recipeData, commentsData, imageData, ratingData = get_single_recipe_info(connection, recipe_id)
+
+    # Calculate average rating
+    total_ratings = len(ratingData)
+    sum_ratings = sum([rating['Value'] for rating in ratingData]) if total_ratings > 0 else 0
+    averageRating = sum_ratings / total_ratings if total_ratings > 0 else 0
+    
     return render_template('single_recipe.html', recipeData=recipeData, commentsData=commentsData, imageData=imageData,
-                           ratingData=ratingData)
+                           ratingData=ratingData, averageRating=averageRating)
 
 
 def get_single_recipe_info(connection, recipeID):

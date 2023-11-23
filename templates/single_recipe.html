@@ -3,6 +3,7 @@
 
 <head>
     <style>
+        /* Submit comment button styling */
         .add-comment-button {
             display: inline-block;
             padding: 10px 20px;
@@ -15,7 +16,29 @@
             border-radius: 5px;
         }
 
-        /* Add more styles as needed */
+        /* Star styling */
+        .rating {
+            unicode-bidi: bidi-override;
+            direction: rtl;
+        }
+
+        .rating>span {
+            display: inline-block;
+            position: relative;
+            width: 1.1em;
+            cursor: pointer;
+        }
+
+        .rating>span:hover:before,
+        .rating>span:hover~span:before {
+            content: "\2605";
+            position: absolute;
+        }
+
+        .rating>span:before {
+            content: "\2606";
+            position: absolute;
+        }
     </style>
 </head>
 <table border="1" id="recipePreviewTable"/>
@@ -38,6 +61,19 @@
     {% else %}
         <p>No ratings avaliable for this recipe</p>
     {% endif %}
+    <p>Average Rating</p>
+    <div class="avg-rating" average-rating="{{ averageRating }}">
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <p>Rate This Recipe</p>
+    <!-- <form id="ratingForm" action="/rate_recipe" method="post">
+        <div class="star-rating" onclick="rateRecipe(event)">
+            <span data-value="1"></span><span data-value="2"></span><span data-value="3"></span><span
+                data-value="4"></span><span data-value="5"></span>
+        </div>
+        <input type="hidden" id="selectedRating" name="rating" value="">
+        <input type="submit" value="Submit Rating">
+    </form> -->
 </div>
 <div>
     <h2>Comments</h2>
@@ -72,6 +108,13 @@
     {% endif %}
 </div>
 <body>
-
+    <script>
+        function rateRecipe(event) {
+            if (event.target.tagName === 'SPAN') {
+                const selectedRating = event.target.getAttribute('data-value');
+                document.getElementById('selectedRating').value = selectedRating;
+            }
+        }
+    </script>
 </body>
 </html>
