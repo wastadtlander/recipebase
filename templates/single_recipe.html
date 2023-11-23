@@ -2,42 +2,28 @@
 <html lang="en">
 
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
-        /* Submit comment button styling */
-        .add-comment-button {
-            display: inline-block;
+        /* Submit button styling */
+        .submit-button {
             padding: 10px 20px;
-            background-color: rgb(3, 3, 3);
+            background-color: black;
             color: white;
             text-align: center;
-            text-decoration: none;
             font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
+            margin-top: 20px;
         }
 
-        /* Star styling */
-        .rating {
-            unicode-bidi: bidi-override;
-            direction: rtl;
-        }
-
-        .rating>span {
-            display: inline-block;
-            position: relative;
-            width: 1.1em;
+        /* Show that the stars are selectable */
+        .rate-container .fa-star {
             cursor: pointer;
         }
-
-        .rating>span:hover:before,
-        .rating>span:hover~span:before {
-            content: "\2605";
-            position: absolute;
-        }
-
-        .rating>span:before {
-            content: "\2606";
-            position: absolute;
+        
+        /* Make full stars orange */
+        .full {
+            color: orange;
         }
     </style>
 </head>
@@ -59,21 +45,34 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p>No ratings avaliable for this recipe</p>
+        <p>No ratings available for this recipe</p>
     {% endif %}
-    <p>Average Rating</p>
-    <div class="avg-rating" average-rating="{{ averageRating }}">
-        <span></span><span></span><span></span><span></span><span></span>
+    <p>Average Rating: <b>{{ averageRating|round(1) }}</b></p>
+    <!-- Display the average rating -->
+    <div>
+        {% for _ in range(5) %}
+            {% if loop.index <= averageRating %}
+                <i class="fa fa-star full"></i> <!-- Orange star -->
+            {% else %}
+                <i class="fa fa-star"></i> <!-- Empty star -->
+            {% endif %}
+        {% endfor %}
     </div>
-    <p>Rate This Recipe</p>
-    <!-- <form id="ratingForm" action="/rate_recipe" method="post">
-        <div class="star-rating" onclick="rateRecipe(event)">
-            <span data-value="1"></span><span data-value="2"></span><span data-value="3"></span><span
-                data-value="4"></span><span data-value="5"></span>
-        </div>
-        <input type="hidden" id="selectedRating" name="rating" value="">
-        <input type="submit" value="Submit Rating">
-    </form> -->
+    <div class="rate-container">
+        <p>Rate This Recipe</p>
+        <form action="/rate_recipe" method="post">
+            <div class="rating" onclick="rateRecipe(event)">
+                <span data-value="1" class="fa fa-star"></span>
+                <span data-value="2" class="fa fa-star"></span>
+                <span data-value="3" class="fa fa-star"></span>
+                <span data-value="4" class="fa fa-star"></span>
+                <span data-value="5" class="fa fa-star"></span>
+            </div>
+            <input type="hidden" id="selectedRating" name="rating" value="">
+            <input type="hidden" name="recipe_id" value="{{ recipeData[0].RecipeID }}">
+            <input type="submit" class="submit-button" value="Submit">
+        </form>
+    </div>
 </div>
 <div>
     <h2>Comments</h2>
@@ -91,8 +90,7 @@
         <label for="text">New Comment</label>
         <br></br>
         <textarea id="text" name="text" rows="4" cols="50" required></textarea><br><br>
-        
-        <input type="submit" class="add-comment-button" value="Submit">
+        <input type="submit" class="submit-button" value="Submit">
     </form>
 </div>
 <div>
@@ -107,14 +105,22 @@
         <p>No images available for this recipe</p>
     {% endif %}
 </div>
-<body>
-    <script>
-        function rateRecipe(event) {
-            if (event.target.tagName === 'SPAN') {
-                const selectedRating = event.target.getAttribute('data-value');
-                document.getElementById('selectedRating').value = selectedRating;
-            }
+<!-- Script to display selected rating -->
+<script>
+    function rateRecipe(event) {
+        if (event.target.tagName === 'SPAN') {
+            const selectedRating = event.target.getAttribute('data-value');
+            document.getElementById('selectedRating').value = selectedRating;
+
+            const stars = document.querySelectorAll('.rating span');
+            stars.forEach((star, index) => {
+                if (index + 1 <= selectedRating) {
+                    star.classList.add('full');
+                } else {
+                    star.classList.remove('full');
+                }
+            });
         }
-    </script>
-</body>
+    }
+</script>
 </html>
