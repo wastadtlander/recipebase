@@ -23,5 +23,5 @@ To rebuild the database after changes have been made to it, run the following:
 3. `DROP DATABASE recipebase;` Your database may be called something else
 4. `CREATE DATABASE recipebase;`
 5. `USE recipebase;`
-6. `SOURCE recipe_base_database.sql`
+6. `SOURCE recipe_base_database.sql;`
 7. `quit`
