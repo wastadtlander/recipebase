@@ -1,32 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Management</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
     {% include 'navbar.html' %}
-
-<h1>User Information</h1>
-    <p><strong>Name:</strong> {{ user.name }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>User Type:</strong> {{ user.user_type }}</p>
-    <p><strong>User ID:</strong> {{ user.id }}</p>
-
-    {% if user.profile_picture %}
-        <p><strong>Profile Picture:</strong></p>
-        <img src="data:image/jpeg;base64,{{ user.profile_picture | b64encode }}" alt="Profile Picture">
-    {% else %}
-        <p>No profile picture available.</p>
-    {% endif %}
-
-
+    <div class="container mt-4">
+        <h1>User Information</h1>
+        <p><strong>Name:</strong> {{ user.name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>User Type:</strong> {{ user.user_type }}</p>
+        <p><strong>User ID:</strong> {{ user.id }}</p>
+        {% if user.profile_picture %}
+            <p><strong>Profile Picture:</strong></p>
+            <img src="data:image/jpeg;base64,{{ user.profile_picture | b64encode }}" alt="Profile Picture" class="img-fluid">
+        {% else %}
+            <p>No profile picture available.</p>
+        {% endif %}
+    </div>
     <div class="container mt-5">
         <h1 class="text-center">Manage Recipes</h1>
-
         <!-- Display Recipes -->
         <table class="table table-bordered mt-4">
             <thead>
@@ -40,25 +36,23 @@
             </thead>
             <tbody>
                 {% for recipe in recipes %}
-                <tr>
-                    <td>{{ recipe.Title }}</td>
-                    <td>{{ recipe.Type }}</td>
-                    <td>{{ recipe.Text }}</td>
-                    <td>{{ recipe.UserID }}</td>
-                    <td>
-                        <form action="{{ url_for('remove_recipe', recipe_id=recipe.RecipeID) }}" method="post">
-                            <button type="submit" class="btn btn-danger">Remove</button>
-                        </form>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>{{ recipe.Title }}</td>
+                        <td>{{ recipe.Type }}</td>
+                        <td>{{ recipe.Text }}</td>
+                        <td>{{ recipe.UserID }}</td>
+                        <td>
+                            <form action="{{ url_for('remove_recipe', recipe_id=recipe.RecipeID) }}" method="post">
+                                <button type="submit" class="btn btn-danger">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
     <div class="container mt-5">
         <h1 class="text-center">Manage Comments</h1>
-
         <!-- Display Comments -->
         <table class="table table-bordered mt-4">
             <thead>
@@ -67,24 +61,26 @@
                     <th>Text</th>
                     <th>Recipe</th>
                     <th>User ID</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for comment in comments %}
-                <tr>
-                    <td>{{ comment.CommentID }}</td>
-                    <td>{{ comment.Text }}</td>
-                    <td>{{ comment.Recipe }}</td>
-                    <td>{{ comment.UserID }}</td>
-                    <td>
-                        <form action="{{ url_for('remove_comment', comment_id=comment.CommentID) }}" method="post">
-                            <button type="submit" class="btn btn-danger">Remove</button>
-                        </form>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>{{ comment.CommentID }}</td>
+                        <td>{{ comment.Text }}</td>
+                        <td>{{ comment.Recipe }}</td>
+                        <td>{{ comment.UserID }}</td>
+                        <td>
+                            <form action="{{ url_for('remove_comment', comment_id=comment.CommentID) }}" method="post">
+                                <button type="submit" class="btn btn-danger">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
