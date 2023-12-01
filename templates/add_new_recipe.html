@@ -1,40 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    {% include 'navbar.html' %}
-    <meta charset="UTF-8">
     <title>Add Recipe</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
-
 <body>
-    <h1>Add Your Recipe</h1>
-    <form action="{{ url_for('add_recipe') }}" method="post" enctype="multipart/form-data">
-    <label for="title">Recipe Title:</label>
-    <input type="text" id="title" name="title" required><br><br>
-
-    <label for="type">Recipe Type:</label>
-    <select id="type" name="type" required>
-        <option value="Asian">Asian</option>
-        <option value="Italian">Italian</option>
-        <option value="Other">Other</option>
-    </select><br><br>
-
-    <label for="text">Recipe Text:</label>
-    <textarea id="text" name="text" rows="4" cols="50" required></textarea><br><br>
-
-    <label for="images">Recipe Images:</label>
-    <input type="file" id="images" name="images" accept="image/*" multiple><br><br>
-
-    <input type="submit" value="Submit">
-</form>
-
-    {% if message %}
-    <p>{{ message }}</p>
-    {% endif %}
-
-    <!-- Include a link back to the main page or other appropriate navigation -->
-    <a href="{{ url_for('index') }}">Back to home</a>
+    {% include 'navbar.html' %}
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Add Your Recipe</h1>
+        <form action="{{ url_for('add_recipe') }}" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="title" class="form-label fw-bold">Recipe Title:</label>
+                <input type="text" id="title" name="title" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="type" class="form-label fw-bold">Recipe Type:</label>
+                <select id="type" name="type" class="form-select" required>
+                    <option value="Asian">Asian</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="text" class="form-label fw-bold">Recipe Text:</label>
+                <textarea id="text" name="text" class="form-control" rows="4" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="images" class="form-label fw-bold">Recipe Images:</label>
+                <input type="file" id="images" name="images" class="form-control" accept="image/*" multiple>
+            </div>
+            <input type="submit" value="Submit" class="btn btn-primary">
+        </form>
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
-
 </html>
