@@ -91,42 +91,54 @@ def index():
                 message = "Connection closed successfully!"
             else:
                 message = "No active connection to close."
-
-        # Delete user functionality
-        elif 'delete_user' in request.form:
-            username = request.form['username']
-            if connection:
-                cursor = connection.cursor()
-
-                sql = "DELETE FROM Comments WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
-                cursor.execute(sql, (username,))
-
-                sql = "DELETE FROM Rating WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
-                cursor.execute(sql, (username,))
-
-                sql = "SELECT RecipeID FROM Recipe WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
-                cursor.execute(sql, (username,))
-                recipe_ids = cursor.fetchall()
-
-                for recipe_id in recipe_ids:
-                    sql = "DELETE FROM RecipeImage WHERE RecipeID = %s"
-                    cursor.execute(sql, (recipe_id[0],))
-
-                    sql = "DELETE FROM Recipe WHERE RecipeID = %s"
-                    cursor.execute(sql, (recipe_id[0],))
-
-                sql = "DELETE FROM User WHERE Name = %s"
-                cursor.execute(sql, (username,))
-
-                connection.commit()
-                cursor.close()
-                message = f"User {username} and related data deleted successfully!"
-            else:
-                message = "No active connection. Can't delete user."
+                
     # fetch users
     users = get_users_from_database()
     connection_status = "Connected" if connection else "Not Connected"
     return render_template('index.html', connection_status=connection_status, message=message, users=users)
+
+@app.route('/delete_user', methods=['POST'])
+@login_required
+def delete_user():
+    global connection
+    message = ""
+
+    if not current_user.is_admin():
+        message = "User is not an admin"
+        return redirect(url_for('index', message=message))
+
+    if request.method == 'POST':
+        username = request.form['username']
+        if connection:
+            cursor = connection.cursor()
+
+            sql = "DELETE FROM Comments WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
+            cursor.execute(sql, (username,))
+
+            sql = "DELETE FROM Rating WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
+            cursor.execute(sql, (username,))
+
+            sql = "SELECT RecipeID FROM Recipe WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
+            cursor.execute(sql, (username,))
+            recipe_ids = cursor.fetchall()
+
+            for recipe_id in recipe_ids:
+                sql = "DELETE FROM RecipeImage WHERE RecipeID = %s"
+                cursor.execute(sql, (recipe_id[0],))
+
+                sql = "DELETE FROM Recipe WHERE RecipeID = %s"
+                cursor.execute(sql, (recipe_id[0],))
+
+            sql = "DELETE FROM User WHERE Name = %s"
+            cursor.execute(sql, (username,))
+
+            connection.commit()
+            cursor.close()
+            message = f"User {username} and related data deleted successfully!"
+        else:
+            message = "No active connection. Can't delete user."
+
+    return redirect(url_for('index', message=message))
 
 
 @login_manager.user_loader
