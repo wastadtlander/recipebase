@@ -26,7 +26,9 @@ class User(UserMixin):
 
     def get_id(self):
         return self.id
-    # pass
+    
+    def is_admin(self):
+        return self.user_type == 'Admin'
 
 def get_db_connection():
     global connection
@@ -140,12 +142,17 @@ def dashboard():
 
 
 @app.route('/add_user', methods=['GET', 'POST'])
+@login_required
 def add_user():
     global connection
     message = ""
 
     if request.content_length > app.config['MAX_CONTENT_LENGTH']:
         abort(413)  # Payload Too Large
+
+    if not current_user.is_admin():
+        message = "User is not an admin"
+        return redirect(url_for('index', message=message))
 
     if request.method == 'POST':
         # Get data from form
@@ -161,7 +168,7 @@ def add_user():
         if connection:
             cursor = connection.cursor()
             insert_query = (
-                "INSERT INTO user (Name, Email, ProfilePicture, UserType, UserID) VALUES (%s, %s, %s, %s, %s)"
+                "INSERT INTO User (Name, Email, ProfilePicture, UserType, UserID) VALUES (%s, %s, %s, %s, %s)"
             )
             data = (name, email, profile_picture, user_type, user_id)
 
@@ -177,8 +184,6 @@ def add_user():
         else:
             message = "No database connection."
 
-    connection_status = "Connected" if connection else "Not Connected"
-    # return render_template('add_user.html', message=message, connection_status=connection_status)
     return redirect(url_for('index', message=message))
 
 # Rating a recipe
