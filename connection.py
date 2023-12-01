@@ -91,7 +91,7 @@ def index():
                 message = "Connection closed successfully!"
             else:
                 message = "No active connection to close."
-                
+
     # fetch users
     users = get_users_from_database()
     connection_status = "Connected" if connection else "Not Connected"
@@ -282,9 +282,9 @@ def add_comment():
 @app.route('/remove_recipe/<recipe_id>', methods=['POST'])
 @login_required
 def remove_recipe(recipe_id):
-    # if current_user.user_type != 'Admin':
-    #     flash('You do not have permission to remove recipes.')
-    #     return redirect(url_for('go_to_user_page'))
+    if not current_user.is_admin():
+        message = "User is not an admin"
+        return redirect(url_for('index', message=message))
 
     # Assuming you have a connection to your database
     cursor = connection.cursor()
