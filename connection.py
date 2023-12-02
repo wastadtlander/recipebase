@@ -169,6 +169,15 @@ def add_user():
     if request.method == 'POST':
         # Get data from form
         name = request.form['name']
+        cursor = connection.cursor()
+        check_name_query = "SELECT COUNT(*) FROM User WHERE LOWER(Name) = %s"
+        cursor.execute(check_name_query, (name.lower(),))
+        result = cursor.fetchone()
+        if result[0]:
+            message = "Username is not unique"
+            return redirect(url_for('index', message=message))
+        cursor.close()
+
         email = request.form.get('email', None)  # email can be NULL based on your schema
         profile_picture = request.files['profile_picture'].read() if 'profile_picture' in request.files else None
         user_type = request.form['user_type']
@@ -293,7 +302,7 @@ def remove_recipe(recipe_id):
         cursor.execute("DELETE FROM recipe WHERE RecipeID = %s", (recipe_id,))
         connection.commit()
         flash('Recipe removed successfully.')
-    except Exception as e:
+    except Exception as ex:
         flash('Error removing recipe: ' + str(e))
     finally:
         cursor.close()
