@@ -91,13 +91,13 @@ DROP TABLE IF EXISTS `User`;
 CREATE TABLE `User` (
   `Name` varchar(64) NOT NULL,
   `Email` varchar(255) DEFAULT NULL,
-  `Profile Picture` binary(1) DEFAULT NULL,
+  `ProfilePicture` binary(1) DEFAULT NULL,
   `UserType` enum('Admin','User') NOT NULL,
   `UserID` varchar(36) NOT NULL,
   PRIMARY KEY (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `User` (`Name`, `Email`, `Profile Picture`, `UserType`, `UserID`) VALUES
+INSERT INTO `User` (`Name`, `Email`, `ProfilePicture`, `UserType`, `UserID`) VALUES
 ('real paul rudd',	'paulruddofficial@gmail.com',	NULL,	'User',	'03057324-6eee-11ee-95c8-96fc48e250ac'),
 ('MinecraftCreeper55',	'joshsandman@hotmail.com',	NULL,	'User',	'09112b8c-6eed-11ee-95c8-96fc48e250ac'),
 ('Zarina',	'zarinamyers01@gmail.com',	NULL,	'User',	'153cc18b-6eee-11ee-95c8-96fc48e250ac'),
