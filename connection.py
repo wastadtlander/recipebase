@@ -305,7 +305,10 @@ def remove_recipe(recipe_id):
     finally:
         cursor.close()
 
-    return redirect(url_for('go_to_user_page'))
+    if current_user.is_admin():
+        return redirect(url_for('go_to_admin_page'))
+    else:
+        return redirect(url_for('go_to_user_page'))
 
 @app.route('/remove_comment/<comment_id>', methods=['POST'])
 @login_required
@@ -322,7 +325,10 @@ def remove_comment(comment_id):
     finally:
         cursor.close()
 
-    return redirect(url_for('go_to_user_page'))
+    if current_user.is_admin():
+        return redirect(url_for('go_to_admin_page'))
+    else:
+        return redirect(url_for('go_to_user_page'))
 
 
 @app.route('/get_image/<int:user_id>')
@@ -583,7 +589,7 @@ def update_table():
 # Viewing individual recipes and related comments.
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
-    recipeData, commentsData, imageData, ratingData = get_single_recipe_info(connection, recipe_id)
+    recipeData, commentsData, imageData, ratingData,  userData = get_single_recipe_info(connection, recipe_id)
 
     # Calculate average rating
     total_ratings = len(ratingData)
@@ -591,7 +597,7 @@ def view_recipe(recipe_id):
     averageRating = sum_ratings / total_ratings if total_ratings > 0 else 0
 
     return render_template('single_recipe.html', recipeData=recipeData, commentsData=commentsData, imageData=imageData,
-                           ratingData=ratingData, averageRating=averageRating)
+                           ratingData=ratingData, averageRating=averageRating, userData=userData)
 
 
 def get_single_recipe_info(connection, recipeID):
