@@ -27,7 +27,7 @@ class User(UserMixin):
 
     def get_id(self):
         return self.id
-    
+
     def is_admin(self):
         return self.user_type == 'Admin'
 
@@ -155,10 +155,10 @@ def dashboard():
 
 
 @app.route('/add_user', methods=['GET', 'POST'])
+@login_required
 def add_user():
     global connection
     message = ""
-    print("adduser")
 
     if request.content_length > app.config['MAX_CONTENT_LENGTH']:
         abort(413)  # Payload Too Large
@@ -289,9 +289,9 @@ def add_comment():
 @app.route('/remove_recipe/<recipe_id>', methods=['POST'])
 @login_required
 def remove_recipe(recipe_id):
-    if not current_user.is_admin():
-        message = "User is not an admin"
-        return redirect(url_for('index', message=message))
+    # if current_user.user_type != 'Admin':
+    #     flash('You do not have permission to remove recipes.')
+    #     return redirect(url_for('go_to_user_page'))
 
     # Assuming you have a connection to your database
     cursor = connection.cursor()
@@ -547,9 +547,9 @@ def get_recipes_from_database():
     if connection:
         cursor = connection.cursor(dictionary=True)
         cursor.execute("""
-            SELECT recipe.Title, recipe.Type, recipe.Text, recipe.RecipeID, user.Name 
-            FROM recipe
-            JOIN user ON recipe.UserID = user.UserID
+        SELECT recipe.*, user.Name
+        FROM recipe
+        JOIN user ON recipe.UserID = user.UserID;
         """)
         recipes = cursor.fetchall()
         cursor.close()
@@ -596,44 +596,72 @@ def view_recipe(recipe_id):
 
 def get_single_recipe_info(connection, recipeID):
     cursor = connection.cursor(dictionary=True)
+
     recipe_query = "SELECT * FROM recipe WHERE RecipeID = %s"
     cursor.execute(recipe_query, (recipeID,))
     recipeInfo = cursor.fetchall()
-    cursor.close()
 
-    cursor = connection.cursor(dictionary=True)
-    comments_query = "SELECT * FROM comments WHERE Recipe = %s"
+    comments_query = """
+        SELECT comments.*, User.Name
+        FROM comments
+        JOIN user ON comments.UserID = user.UserID
+        WHERE comments.Recipe = %s
+    """
     cursor.execute(comments_query, (recipeID,))
     commentsInfo = cursor.fetchall()
-    cursor.close()
 
-    cursor = connection.cursor(dictionary=True)
-    comments_query = "SELECT * FROM recipeimage WHERE RecipeID = %s"
-    cursor.execute(comments_query, (recipeID,))
+    images_query = "SELECT * FROM recipeimage WHERE RecipeID = %s"
+    cursor.execute(images_query, (recipeID,))
     imagesInfo = cursor.fetchall()
-    cursor.close()
 
-    cursor = connection.cursor(dictionary=True)
-    comments_query = "SELECT * FROM rating WHERE RecipeID = %s"
-    cursor.execute(comments_query, (recipeID,))
+    ratings_query = """
+        SELECT rating.*, User.Name
+        FROM rating
+        JOIN user ON rating.UserID = user.UserID
+        WHERE rating.RecipeID = %s
+    """
+    cursor.execute(ratings_query, (recipeID,))
     ratingsInfo = cursor.fetchall()
+
+    user_query = "SELECT * FROM user WHERE UserID IN (SELECT UserID FROM recipe WHERE RecipeID = %s)"
+    cursor.execute(user_query, (recipeID,))
+    userInfo = cursor.fetchall()
+
     cursor.close()
 
-    return recipeInfo, commentsInfo, imagesInfo, ratingsInfo
+    return recipeInfo, commentsInfo, imagesInfo, ratingsInfo, userInfo
 
 
 # Routes for nav bar:
+@app.route("/stats_page")
+def stats_page():
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM User")
+        user_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM User WHERE UserType = 'Admin'")
+        admin_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM Recipe")
+        recipe_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM Comments")
+        comment_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM Rating")
+        rating_count = cursor.fetchone()[0]
+        return render_template("stats.html", user_count=user_count, admin_count=admin_count, recipe_count=recipe_count, comment_count=comment_count, rating_count=rating_count)
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+
 @app.route('/go_to_recipe_page')
 def go_to_recipe_page():
     recipes = get_recipes_from_database()
     return render_template('recipe_page.html', fetchedRecipes=recipes)
 
-
 @app.route('/go_to_index')
 def go_to_index():
     message = check_connection_status()
     return redirect(url_for('index', message=message))
-
 
 @app.route('/go_to_login_page')
 def go_to_login_page():
