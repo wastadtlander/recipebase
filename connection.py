@@ -399,6 +399,35 @@ def update_user():
     return redirect(url_for('index', message=message))
 
 
+@app.route('/update_user_role', methods=['POST'])
+def update_user_role():
+    global connection
+    message = ""
+
+    # Get the user name and new role from the form
+    name = request.form['name']
+    new_role = request.form['user_type']
+
+    if connection:
+        cursor = connection.cursor()
+
+        # Update query to change the user's role
+        update_query = "UPDATE user SET UserType = %s WHERE Name = %s"
+        try:
+            cursor.execute(update_query, (new_role, name))
+            connection.commit()
+            message = f"User role updated successfully for {name}!"
+        except mysql.connector.Error as err:
+            print("Error: {}".format(err))
+            message = "Failed to update user role."
+        finally:
+            cursor.close()
+    else:
+        message = "No database connection."
+
+    return redirect(url_for('index', message=message))
+
+
 @app.route('/add_recipe', methods=['GET', 'POST'])
 @login_required
 def add_recipe():
@@ -497,7 +526,6 @@ def get_users_from_database():
 
 @app.route('/get_user_image/<user_id>', methods=['GET'])
 def get_user_image(user_id):
-    print("getimage")
     conn = get_db_connection()  # Ensure a valid connection
     cursor = conn.cursor()
     try:
@@ -522,6 +550,16 @@ def get_recipes_from_database():
         recipes = cursor.fetchall()
         cursor.close()
         return recipes
+    else:
+        return None
+
+def get_comments_from_database():
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM comments")
+        comments = cursor.fetchall()
+        cursor.close()
+        return comments
     else:
         return None
 
@@ -610,6 +648,23 @@ def go_to_user_page():
     return render_template('user_page.html', user=current_user, recipes=user_recipes, comments=user_comments)
 
 
+@app.route('/go_to_admin_page')
+@login_required
+def go_to_admin_page():
+    if not current_user.is_admin():
+        flash("Access denied: User is not an admin.")
+        return redirect(url_for('index'))
+
+    # Assuming you have functions to get data from each table
+    users = get_users_from_database()
+    recipes = get_recipes_from_database()
+    comments = get_comments_from_database()
+    # Add more as needed
+
+    return render_template('user_page.html',  user=current_user, fetchedUsers=users, recipes=recipes, comments=comments)
+
+
+
 # login as a user via UUID
 @app.route('/login', methods=['POST'])
 def login():
@@ -623,7 +678,7 @@ def login():
         if user:
             username = user['Name']
             # session['currUser'] = user
-            user_data = User(user['UserID'], user['Name'], user['Email'], user['UserType'])
+            user_data = User(user['UserID'], user['Name'], user['Email'], user['UserType'], user['ProfilePicture'])
             login_user(user_data)
             loginStatus = f"Login successful. Welcome, {username}!"
         else:
