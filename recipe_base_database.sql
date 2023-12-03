@@ -1,12 +1,28 @@
--- Adminer 4.8.1 MySQL 5.5.5-10.3.22-MariaDB-log dump
+-- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+--
+-- Host: localhost    Database: recipebase
+-- ------------------------------------------------------
+-- Server version	8.0.34
 
-SET NAMES utf8;
-SET time_zone = '+00:00';
-SET foreign_key_checks = 0;
-SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-DROP TABLE IF EXISTS `Comments`;
-CREATE TABLE `Comments` (
+--
+-- Table structure for table `comments`
+--
+
+DROP TABLE IF EXISTS `comments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comments` (
   `CommentID` varchar(36) NOT NULL,
   `Body` varchar(10000) NOT NULL,
   `UserID` varchar(36) NOT NULL,
@@ -14,32 +30,58 @@ CREATE TABLE `Comments` (
   PRIMARY KEY (`CommentID`),
   KEY `UserID` (`UserID`),
   KEY `Recipe` (`Recipe`),
-  CONSTRAINT `Comments_ibfk_7` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `Comments_ibfk_9` FOREIGN KEY (`Recipe`) REFERENCES `Recipe` (`RecipeID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  CONSTRAINT `Comments_ibfk_7` FOREIGN KEY (`UserID`) REFERENCES `user` (`UserID`),
+  CONSTRAINT `Comments_ibfk_9` FOREIGN KEY (`Recipe`) REFERENCES `recipe` (`RecipeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO `Comments` (`CommentID`, `Body`, `UserID`, `Recipe`) VALUES
-('4444da03-6eed-11ee-95c4-96fc48e250qe', 'I love this recipe for your waffles in 2023 :)',	'2382da03-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac'),
-('8734bh03-6eed-11ee-95c8-96fg68e250ac', 'I also love this recipe for waffles in 2023!',	'1798bce1-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac');
+--
+-- Dumping data for table `comments`
+--
 
-DROP TABLE IF EXISTS `Rating`;
-CREATE TABLE `Rating` (
+LOCK TABLES `comments` WRITE;
+/*!40000 ALTER TABLE `comments` DISABLE KEYS */;
+INSERT INTO `comments` VALUES ('4444da03-6eed-11ee-95c4-96fc48e250qe','I love this recipe for your waffles in 2023 :)','2382da03-6eed-11ee-95c8-96fc48e250ac','031953e1-6ef1-11ee-95c8-96fc48e250ac'),('8734bh03-6eed-11ee-95c8-96fg68e250ac','I also love this recipe for waffles in 2023!','1798bce1-6eed-11ee-95c8-96fc48e250ac','031953e1-6ef1-11ee-95c8-96fc48e250ac');
+/*!40000 ALTER TABLE `comments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rating`
+--
+
+DROP TABLE IF EXISTS `rating`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `rating` (
   `Value` tinyint(1) NOT NULL,
   `UserID` varchar(36) NOT NULL,
   `RecipeID` varchar(36) NOT NULL,
-  PRIMARY KEY (`UserID`, `RecipeID`),
+  PRIMARY KEY (`UserID`,`RecipeID`),
   KEY `UserID` (`UserID`),
   KEY `RecipeID` (`RecipeID`),
-  CONSTRAINT `Rating_ibfk_10` FOREIGN KEY (`RecipeID`) REFERENCES `Recipe` (`RecipeID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `Rating_ibfk_8` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  CONSTRAINT `Rating_ibfk_10` FOREIGN KEY (`RecipeID`) REFERENCES `recipe` (`RecipeID`),
+  CONSTRAINT `Rating_ibfk_8` FOREIGN KEY (`UserID`) REFERENCES `user` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO `Rating` (`Value`, `UserID`, `RecipeID`) VALUES
-(5,	'2382da03-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac'),
-(4,	'1798bce1-6eed-11ee-95c8-96fc48e250ac',	'031953e1-6ef1-11ee-95c8-96fc48e250ac');
+--
+-- Dumping data for table `rating`
+--
 
-DROP TABLE IF EXISTS `Recipe`;
-CREATE TABLE `Recipe` (
+LOCK TABLES `rating` WRITE;
+/*!40000 ALTER TABLE `rating` DISABLE KEYS */;
+INSERT INTO `rating` VALUES (4,'1798bce1-6eed-11ee-95c8-96fc48e250ac','031953e1-6ef1-11ee-95c8-96fc48e250ac'),(5,'2382da03-6eed-11ee-95c8-96fc48e250ac','031953e1-6ef1-11ee-95c8-96fc48e250ac');
+/*!40000 ALTER TABLE `rating` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `recipe`
+--
+
+DROP TABLE IF EXISTS `recipe`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `recipe` (
   `Title` varchar(255) NOT NULL,
   `Type` enum('Asian','Italian','other') DEFAULT NULL,
   `Text` varchar(10000) NOT NULL,
@@ -47,76 +89,81 @@ CREATE TABLE `Recipe` (
   `UserID` varchar(36) NOT NULL,
   PRIMARY KEY (`RecipeID`),
   KEY `UserID` (`UserID`),
-  CONSTRAINT `Recipe_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  CONSTRAINT `Recipe_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `user` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO `Recipe` (`Title`, `Type`, `Text`, `RecipeID`, `UserID`) VALUES
-('[NEW] My famous waffles *2023*',	'other',	'Updated my old waffle recipe with improvements from the comments. It\'s very different, here are all the steps *imagine there are a bunch of steps here*',	'031953e1-6ef1-11ee-95c8-96fc48e250ac',	'c709d09f-6eed-11ee-95c8-96fc48e250ac'),
-('Sausage rolls',	'Italian',	'Here is how you make a sausage rolls!\\nTo make them, follow these instructions fr. This is just dummy data. Imagine these are steps to make a flan:',	'0bfb3b1d-6eef-11ee-95c8-96fc48e250ac',	'337ccde6-6eee-11ee-95c8-96fc48e250ac'),
-('Fast pasta',	'Italian',	'PAsta in a hurry:\\nHere is the pasta recipe',	'0fe6e2db-6ef1-11ee-95c8-96fc48e250ac',	'c709d09f-6eed-11ee-95c8-96fc48e250ac'),
-('Burgers',	NULL,	'1. patty\\n2. meat\\n3. vegetables\\n4. that\'s it. No other ingredients. Imagine I went into more detail than I\'m currently doing because this is just dummy data',	'2a75bfea-6ef0-11ee-95c8-96fc48e250ac',	'337ccde6-6eee-11ee-95c8-96fc48e250ac'),
-('The best Ramen you\'ll ever have',	'Asian',	'I haven\'t seen anyone talk about this amazing ramen recipe, so I\'m sharing it here. It should only take a few minutes to make, too, which is good if you\'re in a hurry',	'34b5593d-6ef1-11ee-95c8-96fc48e250ac',	'c709d09f-6eed-11ee-95c8-96fc48e250ac'),
-('Hot dogs',	NULL,	'Here is how you make a flan!\\nI don\'t actually know what\'s in a flan. This is just dummy data. Imagine these are steps to make a flan:',	'37b775f4-6ef0-11ee-95c8-96fc48e250ac',	'dd05001a-6eec-11ee-95c8-96fc48e250ac'),
-('Ice cream on a stick',	NULL,	'Stir up some milk, I think. Then freeze it and put it on a stick. Now you\'ve made ice cream on a stick seriously',	'4809f39c-6ef0-11ee-95c8-96fc48e250ac',	'dd05001a-6eec-11ee-95c8-96fc48e250ac'),
-('Roasted goose',	'other',	'Take a goose and roast it. ',	'4fd85a7e-6ef1-11ee-95c8-96fc48e250ac',	'a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),
-('Beef',	NULL,	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',	'56574787-6ef1-11ee-95c8-96fc48e250ac',	'a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),
-('Ice cream not on a stick',	NULL,	'Do the same thing as in my recipe for ice cream on a stick (pinned on my profile) but don\'t put the ice cream on a stick at the end',	'5c3a120c-6ef0-11ee-95c8-96fc48e250ac',	'cf7afe5f-6eed-11ee-95c8-96fc48e250ac'),
-('Cake!!!!',	NULL,	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',	'5f279a57-6ef1-11ee-95c8-96fc48e250ac',	'a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),
-('Green eggs and ham',	'Asian',	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',	'69a7980c-6ef1-11ee-95c8-96fc48e250ac',	'a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),
-('3D Country',	NULL,	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',	'712dbd7f-6ef1-11ee-95c8-96fc48e250ac',	'a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),
-('Corn dogs',	NULL,	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',	'8a8fab46-6ef1-11ee-95c8-96fc48e250ac',	'2382da03-6eed-11ee-95c8-96fc48e250ac'),
-('Creamed corn',	'other',	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',	'92056546-6ef1-11ee-95c8-96fc48e250ac',	'2382da03-6eed-11ee-95c8-96fc48e250ac'),
-('Meatloaf',	'other',	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',	'9eb9de0c-6ef1-11ee-95c8-96fc48e250ac',	'2382da03-6eed-11ee-95c8-96fc48e250ac'),
-('I don\'t have a name for this but I made it myself',	'other',	'It\'s a concoction of vinegar, vinegar, wine, winegar, and wine',	'daca394d-6ef0-11ee-95c8-96fc48e250ac',	'c709d09f-6eed-11ee-95c8-96fc48e250ac'),
-('[OUTDATED] MY famous waffles',	'other',	'Put these jawns in the microwave for 4 minutes and serve with ketchup and mustard!',	'e576147c-6ef0-11ee-95c8-96fc48e250ac',	'c709d09f-6eed-11ee-95c8-96fc48e250ac'),
-('Flan',	'other',	'Here is how you make a flan!\\nI don\'t actually know what\'s in a flan. This is just dummy data. Imagine these are steps to make a flan:\\n1.Step 1\\n2. Step 2',	'ef1f8a0f-6eee-11ee-95c8-96fc48e250ac',	'337ccde6-6eee-11ee-95c8-96fc48e250ac'),
-('Chicken nuggets',	'other',	'Put these jawns in the microwave for 4 minutes and serve with ketchup and mustard!',	'fec50b65-6eef-11ee-95c8-96fc48e250ac',	'337ccde6-6eee-11ee-95c8-96fc48e250ac');
+--
+-- Dumping data for table `recipe`
+--
 
-DROP TABLE IF EXISTS `RecipeImage`;
-CREATE TABLE `RecipeImage` (
-  `Image` varchar(255) NOT NULL,
+LOCK TABLES `recipe` WRITE;
+/*!40000 ALTER TABLE `recipe` DISABLE KEYS */;
+INSERT INTO `recipe` VALUES ('[NEW] My famous waffles *2023*','other','Updated my old waffle recipe with improvements from the comments. It\'s very different, here are all the steps *imagine there are a bunch of steps here*','031953e1-6ef1-11ee-95c8-96fc48e250ac','c709d09f-6eed-11ee-95c8-96fc48e250ac'),('Sausage rolls','Italian','Here is how you make a sausage rolls!\\nTo make them, follow these instructions fr. This is just dummy data. Imagine these are steps to make a flan:','0bfb3b1d-6eef-11ee-95c8-96fc48e250ac','337ccde6-6eee-11ee-95c8-96fc48e250ac'),('Fast pasta','Italian','PAsta in a hurry:\\nHere is the pasta recipe','0fe6e2db-6ef1-11ee-95c8-96fc48e250ac','c709d09f-6eed-11ee-95c8-96fc48e250ac'),('Burgers',NULL,'1. patty\\n2. meat\\n3. vegetables\\n4. that\'s it. No other ingredients. Imagine I went into more detail than I\'m currently doing because this is just dummy data','2a75bfea-6ef0-11ee-95c8-96fc48e250ac','337ccde6-6eee-11ee-95c8-96fc48e250ac'),('The best Ramen you\'ll ever have','Asian','I haven\'t seen anyone talk about this amazing ramen recipe, so I\'m sharing it here. It should only take a few minutes to make, too, which is good if you\'re in a hurry','34b5593d-6ef1-11ee-95c8-96fc48e250ac','c709d09f-6eed-11ee-95c8-96fc48e250ac'),('Hot dogs',NULL,'Here is how you make a flan!\\nI don\'t actually know what\'s in a flan. This is just dummy data. Imagine these are steps to make a flan:','37b775f4-6ef0-11ee-95c8-96fc48e250ac','dd05001a-6eec-11ee-95c8-96fc48e250ac'),('Ice cream on a stick',NULL,'Stir up some milk, I think. Then freeze it and put it on a stick. Now you\'ve made ice cream on a stick seriously','4809f39c-6ef0-11ee-95c8-96fc48e250ac','dd05001a-6eec-11ee-95c8-96fc48e250ac'),('Roasted goose','other','Take a goose and roast it. ','4fd85a7e-6ef1-11ee-95c8-96fc48e250ac','a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),('Beef',NULL,'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','56574787-6ef1-11ee-95c8-96fc48e250ac','a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),('Ice cream not on a stick',NULL,'Do the same thing as in my recipe for ice cream on a stick (pinned on my profile) but don\'t put the ice cream on a stick at the end','5c3a120c-6ef0-11ee-95c8-96fc48e250ac','cf7afe5f-6eed-11ee-95c8-96fc48e250ac'),('Cake!!!!',NULL,'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','5f279a57-6ef1-11ee-95c8-96fc48e250ac','a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),('Green eggs and ham','Asian','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','69a7980c-6ef1-11ee-95c8-96fc48e250ac','a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),('3D Country',NULL,'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','712dbd7f-6ef1-11ee-95c8-96fc48e250ac','a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),('Corn dogs',NULL,'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','8a8fab46-6ef1-11ee-95c8-96fc48e250ac','2382da03-6eed-11ee-95c8-96fc48e250ac'),('Creamed corn','other','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','92056546-6ef1-11ee-95c8-96fc48e250ac','2382da03-6eed-11ee-95c8-96fc48e250ac'),('qwr','Asian','qwr','976d9b96-d59e-47c1-8292-fcba9bc68829','cf7afe5f-6eed-11ee-95c8-96fc48e250ac'),('Meatloaf','other','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','9eb9de0c-6ef1-11ee-95c8-96fc48e250ac','2382da03-6eed-11ee-95c8-96fc48e250ac'),('I don\'t have a name for this but I made it myself','other','It\'s a concoction of vinegar, vinegar, wine, winegar, and wine','daca394d-6ef0-11ee-95c8-96fc48e250ac','c709d09f-6eed-11ee-95c8-96fc48e250ac'),('[OUTDATED] MY famous waffles','other','Put these jawns in the microwave for 4 minutes and serve with ketchup and mustard!','e576147c-6ef0-11ee-95c8-96fc48e250ac','c709d09f-6eed-11ee-95c8-96fc48e250ac'),('Flan','other','Here is how you make a flan!\\nI don\'t actually know what\'s in a flan. This is just dummy data. Imagine these are steps to make a flan:\\n1.Step 1\\n2. Step 2','ef1f8a0f-6eee-11ee-95c8-96fc48e250ac','337ccde6-6eee-11ee-95c8-96fc48e250ac'),('Chicken nuggets','other','Put these jawns in the microwave for 4 minutes and serve with ketchup and mustard!','fec50b65-6eef-11ee-95c8-96fc48e250ac','337ccde6-6eee-11ee-95c8-96fc48e250ac');
+/*!40000 ALTER TABLE `recipe` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `recipeimage`
+--
+
+DROP TABLE IF EXISTS `recipeimage`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `recipeimage` (
+  `Image` mediumblob NOT NULL,
   `RecipeID` varchar(36) NOT NULL,
-  PRIMARY KEY (`RecipeID`,`Image`),
-  CONSTRAINT `RecipeImage_ibfk_2` FOREIGN KEY (`RecipeID`) REFERENCES `Recipe` (`RecipeID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `ImageID` int NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`ImageID`,`RecipeID`),
+  KEY `fk_recipe` (`RecipeID`),
+  CONSTRAINT `fk_recipe` FOREIGN KEY (`RecipeID`) REFERENCES `recipe` (`RecipeID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO `RecipeImage` (`Image`, `RecipeID`) VALUES
-('/031953e1-6ef1-11ee-95c8-96fc48e250ac/file1.png',	'031953e1-6ef1-11ee-95c8-96fc48e250ac'),
-('/031953e1-6ef1-11ee-95c8-96fc48e250ac/file2.png',	'031953e1-6ef1-11ee-95c8-96fc48e250ac'),
-('/031953e1-6ef1-11ee-95c8-96fc48e250ac/file3.png',	'031953e1-6ef1-11ee-95c8-96fc48e250ac'),
-('/2a75bfea-6ef0-11ee-95c8-96fc48e250ac/file1.png',	'2a75bfea-6ef0-11ee-95c8-96fc48e250ac'),
-('/2a75bfea-6ef0-11ee-95c8-96fc48e250ac/file2.png',	'2a75bfea-6ef0-11ee-95c8-96fc48e250ac');
+--
+-- Dumping data for table `recipeimage`
+--
 
-DROP TABLE IF EXISTS `User`;
-CREATE TABLE `User` (
+LOCK TABLES `recipeimage` WRITE;
+/*!40000 ALTER TABLE `recipeimage` DISABLE KEYS */;
+INSERT INTO `recipeimage` VALUES (0x89504E470D0A1A0A0000000D494844520000003200000025080600000000ECBA92000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000000970485973000016250000162501495224F000000925494441545847C598DB6E14D9158657559F7C3E60636CCE82CC05202124C408C405D779002E72999B288F314889E63AAF91B780AB41A308995802266082EDF601BB6D77BB8FD55D5559DFEE5ECD9EA69B319389F2A34DEDF3FED7DAFF5A55EDE0C18307A97848D39F354F8D2008240C43C966B3EE697DE3E3E3B2B0B0208B8B8BAE9ECFE7656C6C4C72B99CCECB6809DCDC76D491B899957A45D7D617652AB32C693B2F7114484626250CF26E9E6EE990A689D4DBC752691465B7B22AC1FDFBF73F638E3190F031AC0DE14C26E3C851671D75889F3F7F5EE6E7E79530043E1D819F7495C41D25DF0CA5590EA4559A96A9F01B99C8CD4B980692E87C5604FCAF0B3AA91A9944D2EAD4E424DA91EDE355D9AAFC43E2A02679DD3F51A3861AE2C3276CC0B356F02ECFB9B939999999719E7608944C2292C4229D562849A32099644E1B05259F955C7246C6B30B6A12FB4259690489C46A612BAE49B5B52F27AD5D69768EA4A165BFF62FEDDB934C56B9E034FE79EA718658874F9A429B31EAB3B3B372F6EC594716AF530A8582939281B951144BD2CA49EB382FB9F60529641625E8E89C7656094C4A26C874492BF9DE2269B42B526E6CC976F9851C373745329144494D0DA848A23721BA0641F89A805BA7A33715C7AE040F1F3E4C210A21F33AC64C4C4CC8CACAB22C2D9D7375161A209CAA0452F576D24E25562DD78F54CF950599CF7FA39E9E809FA3DB45D77B8993485BA24E55CACD1DD9ADAEC987C3E7124BD5390603934485C5620567D2360743BCD16848B3D9740EA54E5FBBDD96E0F1E3C7299B208FC9C949E779EA2C34F26C9668D0454D6D4753924D673410C7A55DCD484196652C3BEBB49DAA9CBA2B201DAB2C6A528B4A2E201BED9234E3B2EC57D7A5D2DC5089A8977B816EC40DCE68CED4522E971D0F9C09F1C3C343479E388CA2A86F78F0E4C993B49B41C834DD2B67206AC512D5B22A910999C85ED2605C54EFEB9CA420B9500D556DFBC793455A9D1325BD2B450DC652F32749C3B67412F560BB2C6D954810A873D46062C11DAE0479220DBC8A032147DDBC5F2A959CA421CCBCA3A323376F6A6ACA71B67D82BFFEE5FB348D556F4A326EE45422A1E4A2CB323FF63BC906059DA4FAE9ABB32791A4A3049B4ABCAA01B9A75EFE49FE7DF8A34469490AF99CC48E5CC71DEE0EE9DD2C6B0124194309F57A5D4E4E4E9CE72F5EBC28B55ACD19C23875E48E52588BFC598BE3B921DAD4D927F8EECF7F4FD3E6948C65963430A738CE1D66D4496D10AEB54A72D4D8907AE740A2F8440EEBEFB56C697E8F25D4C3E018435CD71B71409DC3F126E4F0F8DEDE9ECB767815BD4398F13367CEB827E4799AB7B901C8D26FC4796208E32E0CFEF6A7374AB59B47BA48A5D5EE05E3F19AECD5FEA9F95A3D14681ED7ECD26AD735F3E895F6B89A977D401609400659E075930BA429E7CE9D736BCD48084D4F4FF7894196AC68C43182311B37D076CFEFFFF8631A69DE3E893ECA616D5DD60F7ED0002DAAC70A9ABE324A20D2C3342BF436B18566005E86245EE65DC2C1AD564B3E7EFCE83C4676C13023825110C1CBCC05469C5BB2944EF109FBF0791882DF3FFA437AD4D8D4B769F7300842AE4BD4267703128268D3EAE6CD6AB5EA08E27DF33CBA672E84ED6023C739903689D0A60C23FE19E15EFBB3FE6FBFBDA78CBBD9C307C60016988EC920972F5FEE4B0560082991746844D98B71BC6B84AD18690A607FE60F1233F8FDA3EA20B877EF9EEED3F53805D210E549F06110DEC7109E1036B2CC37400CD21843DDA4E207256B7C9C86BC0FEB1F36EE0CC1D3C7C7C74E1226176441562197430083D800CD03C81949AB439E3A8632D7CA280C253462BEF58F1CBF7BF76EFAEAD52B770346168F721B7E9F11344F130F18EB931EC4A8430DFEF8A8B9A799034288E2759E06B44DB0926DB81D6EC464417B6E6ED6A54ADFFBFF0F70AE9510DDFBDAA513B204AB1F03D43196DB989E9EF94DC98FDAEB4B670C8E8504B60F3C0C618ADD8415FA0876E4F5BFC6D73A2AC4D3480472E47CEA263336F30D628C971EFDA7298661639451F8D2D82884689D9FA5F656F66F0323ADD0660EC67C0D7E89D4AF213D0C219A474E04BCBDADED460007993164B2AFC17F6B0471CA6BE1FDFBF7F2F6ED5B9745C13067BA60E713C3DE1F78DE0EF09FDC1646336EF0EB83F82592C3C01AF6DCDFDF97D5D55579F6EC993C7FFE5CDEBD7B27DBDBDBCE28782C2D2DF5567C42B8BBBBEB522D460C3BDC6EC76ECE80B7363636A452A9F47A3EE1D71A01483EAF5FBF969D9D9DFE67101CE0C759BCE3782DF8606DC87792A55AF3B07986429D8D78B7F886F099CE0F9EADAD2D779BA781C5DE97803A90F9E0FB097E48CB7E9B0C822FB7EF8C3407B198621F758036699718A1CE218F1E3D929B376F0A37CA2118EA83FD4CB67C0261F0870F1FDC5A120C84EC5C60A4B979FE1E06597E3502C698C79A959515D7666F9EB62EB486DF6907D0E660EA1866E3F67942D0F1F31469FAC03064F7F2E54B79F1E285BC79F3C6699C0F4FF4CF7E6440DF59F401D4C11CA4657D769370C161C31430FC978BC2AE964D204C9001FAF87064333CCC9F422D9B1890066378947990A0B01737449D7D0609D1BFB9B9E99C80C77D30DF6E91FD07F199212CA0E055804156E8C78B5C3BE489130CF409318760643E07D33660887DBF0D6ADDF6477676DBE600C6F8124709DCAA71F3F13343D8C80A8BFD3EBF0D9E3E7D2A6B6B6B2ECBF81B73302F58FDAA76699275F4D91873318875967DD893319E10B60F528C4582C4C5952B579C126CAF410CBD110EF78B9137D026D8EFDCB9E30E1B9CB3BEBEEE6203991871081809E69BC70DB69E18C01862EFD6AD5B72FBF66DB971E3865CB870A12FEF61E81B621BF1F4CB202005390E23FDA2F9415204BF4960902C6B90272F37EBF38121D7AE5D93EBD7AF3B29710E12C4F851608FD0F71430036CA11D64733004928C5FBA74C965180EF3811C2890B2FD28A456FE0CC45AF618053F439E168EAD7F9801C2068CF0E3E0E0E0A0FF12254DF2F7621FD6663F6E0BCD2F2F2F3B9D133FF4FBCEFB2DA07B06BAE7A7EF2BBC650400750A7F3DE10600418AD77862C8D5AB57FBEB6CBC582C3AB24889C2EDB0A7DD34B0F9C0AFFB18ECB7F6A0A3E975AE61028583ACD8229E640E230CF8EEA1F01E413236D7603768FB0C8E03BF6FD838F0FB214CC1085EB0C8D4D27FDF3D4C002CB43A3022BCA07C2F900AC92C83EF0A0337765AAD7F698EC5A47D9CC20727F1D98311FC85B3582CCA7F00B5D613432B82D8CD0000000049454E44AE426082,'976d9b96-d59e-47c1-8292-fcba9bc68829',1);
+/*!40000 ALTER TABLE `recipeimage` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user` (
   `Name` varchar(64) NOT NULL,
   `Email` varchar(255) DEFAULT NULL,
-  `ProfilePicture` binary(1) DEFAULT NULL,
+  `ProfilePicture` mediumblob,
   `UserType` enum('Admin','User') NOT NULL,
-  `UserID` varchar(36) NOT NULL,
+  `UserID` varchar(36) NOT NULL DEFAULT (uuid()),
   PRIMARY KEY (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO `User` (`Name`, `Email`, `ProfilePicture`, `UserType`, `UserID`) VALUES
-('real paul rudd',	'paulruddofficial@gmail.com',	NULL,	'User',	'03057324-6eee-11ee-95c8-96fc48e250ac'),
-('MinecraftCreeper55',	'joshsandman@hotmail.com',	NULL,	'User',	'09112b8c-6eed-11ee-95c8-96fc48e250ac'),
-('Zarina',	'zarinamyers01@gmail.com',	NULL,	'User',	'153cc18b-6eee-11ee-95c8-96fc48e250ac'),
-('Nancy Wheeler',	'iluvdogs@comcast.net',	NULL,	'Admin',	'1798bce1-6eed-11ee-95c8-96fc48e250ac'),
-('MintyFresh',	'greenpenguin@gmail.com',	NULL,	'User',	'2382da03-6eed-11ee-95c8-96fc48e250ac'),
-('Anthony Laraway',	'anthony.laraway@gmail.com',	NULL,	'User',	'2dbf3b2b-6eed-11ee-95c8-96fc48e250ac'),
-('This name is taken',	'electricliz999@gmail.com',	NULL,	'User',	'337ccde6-6eee-11ee-95c8-96fc48e250ac'),
-('Domoto',	'domoto_domoto3@gmail.com',	NULL,	'User',	'3acdb172-6eee-11ee-95c8-96fc48e250ac'),
-('Laurie B',	'brooksworthlaurie1@gmail.com',	NULL,	'User',	'524c06d7-6eee-11ee-95c8-96fc48e250ac'),
-('17th Row',	'the17throw@gmail.com',	NULL,	'User',	'5a022c06-6eee-11ee-95c8-96fc48e250ac'),
-('Max',	'Maxine1980__@gmail.com',	NULL,	'User',	'8a4beba9-6eee-11ee-95c8-96fc48e250ac'),
-('Max',	'maxthejedi@gmail.com',	NULL,	'User',	'961141ae-6eee-11ee-95c8-96fc48e250ac'),
-('London',	'londonemail@email.com',	NULL,	'User',	'a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),
-('Jesse1717',	'the_goat_jesse@gmail.com',	NULL,	'User',	'bd5d7ab7-6eed-11ee-95c8-96fc48e250ac'),
-('Recipe Base',	'contact@recipebase.com',	NULL,	'Admin',	'c709d09f-6eed-11ee-95c8-96fc48e250ac'),
-('Grammar',	'grammar@gmail.com',	NULL,	'User',	'cf7afe5f-6eed-11ee-95c8-96fc48e250ac'),
-('John Green',	'john.green@gmail.com',	NULL,	'User',	'dd05001a-6eec-11ee-95c8-96fc48e250ac'),
-('Lafayette Geese',	'g.lafa@gmail.com',	NULL,	'User',	'df2cb894-6eed-11ee-95c8-96fc48e250ac'),
-('Cameron Winter',	'camw1999@gmail.com',	NULL,	'User',	'e8e9cf4a-6eec-11ee-95c8-96fc48e250ac'),
-('LowEra',	'beth.o.l@gmail.com',	NULL,	'User',	'f67bcd73-6eed-11ee-95c8-96fc48e250ac');
+--
+-- Dumping data for table `user`
+--
 
--- 2023-10-20 22:24:19
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES ('real paul rudd','paulruddofficial@gmail.com',NULL,'User','03057324-6eee-11ee-95c8-96fc48e250ac'),('MinecraftCreeper55','joshsandman@hotmail.com',NULL,'User','09112b8c-6eed-11ee-95c8-96fc48e250ac'),('Zarina','zarinamyers01@gmail.com',NULL,'User','153cc18b-6eee-11ee-95c8-96fc48e250ac'),('Nancy Wheeler','iluvdogs@comcast.net',NULL,'Admin','1798bce1-6eed-11ee-95c8-96fc48e250ac'),('MintyFresh','greenpenguin@gmail.com',NULL,'User','2382da03-6eed-11ee-95c8-96fc48e250ac'),('Anthony Laraway','anthony.laraway@gmail.com',NULL,'User','2dbf3b2b-6eed-11ee-95c8-96fc48e250ac'),('This name is taken','electricliz999@gmail.com',NULL,'User','337ccde6-6eee-11ee-95c8-96fc48e250ac'),('Domoto','domoto_domoto3@gmail.com',NULL,'User','3acdb172-6eee-11ee-95c8-96fc48e250ac'),('Laurie B','brooksworthlaurie1@gmail.com',NULL,'User','524c06d7-6eee-11ee-95c8-96fc48e250ac'),('test','test@gmail.com',0x89504E470D0A1A0A0000000D494844520000003200000025080600000000ECBA92000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000000970485973000016250000162501495224F000000925494441545847C598DB6E14D9158657559F7C3E60636CCE82CC05202124C408C405D779002E72999B288F314889E63AAF91B780AB41A308995802266082EDF601BB6D77BB8FD55D5559DFEE5ECD9EA69B319389F2A34DEDF3FED7DAFF5A55EDE0C18307A97848D39F354F8D2008240C43C966B3EE697DE3E3E3B2B0B0208B8B8BAE9ECFE7656C6C4C72B99CCECB6809DCDC76D491B899957A45D7D617652AB32C693B2F7114484626250CF26E9E6EE990A689D4DBC752691465B7B22AC1FDFBF73F638E3190F031AC0DE14C26E3C851671D75889F3F7F5EE6E7E79530043E1D819F7495C41D25DF0CA5590EA4559A96A9F01B99C8CD4B980692E87C5604FCAF0B3AA91A9944D2EAD4E424DA91EDE355D9AAFC43E2A02679DD3F51A3861AE2C3276CC0B356F02ECFB9B939999999719E7608944C2292C4229D562849A32099644E1B05259F955C7246C6B30B6A12FB4259690489C46A612BAE49B5B52F27AD5D69768EA4A165BFF62FEDDB934C56B9E034FE79EA718658874F9A429B31EAB3B3B372F6EC594716AF530A8582939281B951144BD2CA49EB382FB9F60529641625E8E89C7656094C4A26C874492BF9DE2269B42B526E6CC976F9851C373745329144494D0DA848A23721BA0641F89A805BA7A33715C7AE040F1F3E4C210A21F33AC64C4C4CC8CACAB22C2D9D7375161A209CAA0452F576D24E25562DD78F54CF950599CF7FA39E9E809FA3DB45D77B8993485BA24E55CACD1DD9ADAEC987C3E7124BD5390603934485C5620567D2360743BCD16848B3D9740EA54E5FBBDD96E0F1E3C7299B208FC9C949E779EA2C34F26C9668D0454D6D4753924D673410C7A55DCD484196652C3BEBB49DAA9CBA2B201DAB2C6A528B4A2E201BED9234E3B2EC57D7A5D2DC5089A8977B816EC40DCE68CED4522E971D0F9C09F1C3C343479E388CA2A86F78F0E4C993B49B41C834DD2B67206AC512D5B22A910999C85ED2605C54EFEB9CA420B9500D556DFBC793455A9D1325BD2B450DC652F32749C3B67412F560BB2C6D954810A873D46062C11DAE0479220DBC8A032147DDBC5F2A959CA421CCBCA3A323376F6A6ACA71B67D82BFFEE5FB348D556F4A326EE45422A1E4A2CB323FF63BC906059DA4FAE9ABB32791A4A3049B4ABCAA01B9A75EFE49FE7DF8A34469490AF99CC48E5CC71DEE0EE9DD2C6B0124194309F57A5D4E4E4E9CE72F5EBC28B55ACD19C23875E48E52588BFC598BE3B921DAD4D927F8EECF7F4FD3E6948C65963430A738CE1D66D4496D10AEB54A72D4D8907AE740A2F8440EEBEFB56C697E8F25D4C3E018435CD71B71409DC3F126E4F0F8DEDE9ECB767815BD4398F13367CEB827E4799AB7B901C8D26FC4796208E32E0CFEF6A7374AB59B47BA48A5D5EE05E3F19AECD5FEA9F95A3D14681ED7ECD26AD735F3E895F6B89A977D401609400659E075930BA429E7CE9D736BCD48084D4F4FF7894196AC68C43182311B37D076CFEFFFF8631A69DE3E893ECA616D5DD60F7ED0002DAAC70A9ABE324A20D2C3342BF436B18566005E86245EE65DC2C1AD564B3E7EFCE83C4676C13023825110C1CBCC05469C5BB2944EF109FBF0791882DF3FFA437AD4D8D4B769F7300842AE4BD4267703128268D3EAE6CD6AB5EA08E27DF33CBA672E84ED6023C739903689D0A60C23FE19E15EFBB3FE6FBFBDA78CBBD9C307C60016988EC920972F5FEE4B0560082991746844D98B71BC6B84AD18690A607FE60F1233F8FDA3EA20B877EF9EEED3F53805D210E549F06110DEC7109E1036B2CC37400CD21843DDA4E207256B7C9C86BC0FEB1F36EE0CC1D3C7C7C74E1226176441562197430083D800CD03C81949AB439E3A8632D7CA280C253462BEF58F1CBF7BF76EFAEAD52B770346168F721B7E9F11344F130F18EB931EC4A8430DFEF8A8B9A799034288E2759E06B44DB0926DB81D6EC464417B6E6ED6A54ADFFBFF0F70AE9510DDFBDAA513B204AB1F03D43196DB989E9EF94DC98FDAEB4B670C8E8504B60F3C0C618ADD8415FA0876E4F5BFC6D73A2AC4D3480472E47CEA263336F30D628C971EFDA7298661639451F8D2D82884689D9FA5F656F66F0323ADD0660EC67C0D7E89D4AF213D0C219A474E04BCBDADED460007993164B2AFC17F6B0471CA6BE1FDFBF7F2F6ED5B9745C13067BA60E713C3DE1F78DE0EF09FDC1646336EF0EB83F82592C3C01AF6DCDFDF97D5D55579F6EC993C7FFE5CDEBD7B27DBDBDBCE28782C2D2DF5567C42B8BBBBEB522D460C3BDC6EC76ECE80B7363636A452A9F47A3EE1D71A01483EAF5FBF969D9D9DFE67101CE0C759BCE3782DF8606DC87792A55AF3B07986429D8D78B7F886F099CE0F9EADAD2D779BA781C5DE97803A90F9E0FB097E48CB7E9B0C822FB7EF8C3407B198621F758036699718A1CE218F1E3D929B376F0A37CA2118EA83FD4CB67C0261F0870F1FDC5A120C84EC5C60A4B979FE1E06597E3502C698C79A959515D7666F9EB62EB486DF6907D0E660EA1866E3F67942D0F1F31469FAC03064F7F2E54B79F1E285BC79F3C6699C0F4FF4CF7E6440DF59F401D4C11CA4657D769370C161C31430FC978BC2AE964D204C9001FAF87064333CCC9F422D9B1890066378947990A0B01737449D7D0609D1BFB9B9E99C80C77D30DF6E91FD07F199212CA0E055804156E8C78B5C3BE489130CF409318760643E07D33660887DBF0D6ADDF6477676DBE600C6F8124709DCAA71F3F13343D8C80A8BFD3EBF0D9E3E7D2A6B6B6B2ECBF81B73302F58FDAA76699275F4D91873318875967DD893319E10B60F528C4582C4C5952B579C126CAF410CBD110EF78B9137D026D8EFDCB9E30E1B9CB3BEBEEE6203991871081809E69BC70DB69E18C01862EFD6AD5B72FBF66DB971E3865CB870A12FEF61E81B621BF1F4CB202005390E23FDA2F9415204BF4960902C6B90272F37EBF38121D7AE5D93EBD7AF3B29710E12C4F851608FD0F71430036CA11D64733004928C5FBA74C965180EF3811C2890B2FD28A456FE0CC45AF618053F439E168EAD7F9801C2068CF0E3E0E0E0A0FF12254DF2F7621FD6663F6E0BCD2F2F2F3B9D133FF4FBCEFB2DA07B06BAE7A7EF2BBC650400750A7F3DE10600418AD77862C8D5AB57FBEB6CBC582C3AB24889C2EDB0A7DD34B0F9C0AFFB18ECB7F6A0A3E975AE61028583ACD8229E640E230CF8EEA1F01E413236D7603768FB0C8E03BF6FD838F0FB214CC1085EB0C8D4D27FDF3D4C002CB43A3022BCA07C2F900AC92C83EF0A0337765AAD7F698EC5A47D9CC20727F1D98311FC85B3582CCA7F00B5D613432B82D8CD0000000049454E44AE426082,'User','52baf02b-7da4-46cd-a335-6983995cc5ab'),('17th Row','the17throw@gmail.com',NULL,'User','5a022c06-6eee-11ee-95c8-96fc48e250ac'),('Max','Maxine1980__@gmail.com',NULL,'User','8a4beba9-6eee-11ee-95c8-96fc48e250ac'),('Max','maxthejedi@gmail.com',NULL,'User','961141ae-6eee-11ee-95c8-96fc48e250ac'),('London','londonemail@email.com',NULL,'User','a3c7c9b0-6eed-11ee-95c8-96fc48e250ac'),('Jesse1717','the_goat_jesse@gmail.com',NULL,'User','bd5d7ab7-6eed-11ee-95c8-96fc48e250ac'),('Recipe Base','contact@recipebase.com',NULL,'Admin','c709d09f-6eed-11ee-95c8-96fc48e250ac'),('Grammar','grammar@gmail.com',NULL,'User','cf7afe5f-6eed-11ee-95c8-96fc48e250ac'),('John Green','john.green@gmail.com',NULL,'User','dd05001a-6eec-11ee-95c8-96fc48e250ac'),('Lafayette Geese','g.lafa@gmail.com',NULL,'User','df2cb894-6eed-11ee-95c8-96fc48e250ac'),('Cameron Winter','camw1999@gmail.com',NULL,'User','e8e9cf4a-6eec-11ee-95c8-96fc48e250ac'),('LowEra','beth.o.l@gmail.com',NULL,'User','f67bcd73-6eed-11ee-95c8-96fc48e250ac');
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2023-12-02 12:14:53
