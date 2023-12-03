@@ -500,7 +500,11 @@ def get_users_from_database():
 def get_recipes_from_database():
     if connection:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM recipe")
+        cursor.execute("""
+        SELECT recipe.*, user.Name
+        FROM recipe
+        JOIN user ON recipe.UserID = user.UserID;
+        """)
         recipes = cursor.fetchall()
         cursor.close()
         return recipes
@@ -518,7 +522,7 @@ def update_table():
 # Viewing individual recipes and related comments.
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
-    recipeData, commentsData, imageData, ratingData = get_single_recipe_info(connection, recipe_id)
+    recipeData, commentsData, imageData, ratingData, userData = get_single_recipe_info(connection, recipe_id)
 
     # Calculate average rating
     total_ratings = len(ratingData)
@@ -526,35 +530,45 @@ def view_recipe(recipe_id):
     averageRating = sum_ratings / total_ratings if total_ratings > 0 else 0
 
     return render_template('single_recipe.html', recipeData=recipeData, commentsData=commentsData, imageData=imageData,
-                           ratingData=ratingData, averageRating=averageRating)
+                           ratingData=ratingData, averageRating=averageRating, userData=userData)
 
 
 def get_single_recipe_info(connection, recipeID):
     cursor = connection.cursor(dictionary=True)
+    
     recipe_query = "SELECT * FROM recipe WHERE RecipeID = %s"
     cursor.execute(recipe_query, (recipeID,))
     recipeInfo = cursor.fetchall()
-    cursor.close()
 
-    cursor = connection.cursor(dictionary=True)
-    comments_query = "SELECT * FROM comments WHERE Recipe = %s"
+    comments_query = """
+        SELECT comments.*, User.Name
+        FROM comments
+        JOIN user ON comments.UserID = user.UserID
+        WHERE comments.Recipe = %s
+    """
     cursor.execute(comments_query, (recipeID,))
     commentsInfo = cursor.fetchall()
-    cursor.close()
 
-    cursor = connection.cursor(dictionary=True)
-    comments_query = "SELECT * FROM recipeimage WHERE RecipeID = %s"
-    cursor.execute(comments_query, (recipeID,))
+    images_query = "SELECT * FROM recipeimage WHERE RecipeID = %s"
+    cursor.execute(images_query, (recipeID,))
     imagesInfo = cursor.fetchall()
-    cursor.close()
 
-    cursor = connection.cursor(dictionary=True)
-    comments_query = "SELECT * FROM rating WHERE RecipeID = %s"
-    cursor.execute(comments_query, (recipeID,))
+    ratings_query = """
+        SELECT rating.*, User.Name
+        FROM rating
+        JOIN user ON rating.UserID = user.UserID
+        WHERE rating.RecipeID = %s
+    """
+    cursor.execute(ratings_query, (recipeID,))
     ratingsInfo = cursor.fetchall()
+
+    user_query = "SELECT * FROM user WHERE UserID IN (SELECT UserID FROM recipe WHERE RecipeID = %s)"
+    cursor.execute(user_query, (recipeID,))
+    userInfo = cursor.fetchall()
+
     cursor.close()
 
-    return recipeInfo, commentsInfo, imagesInfo, ratingsInfo
+    return recipeInfo, commentsInfo, imagesInfo, ratingsInfo, userInfo
 
 
 # Routes for nav bar:

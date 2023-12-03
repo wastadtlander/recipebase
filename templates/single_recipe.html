@@ -21,7 +21,7 @@
                 <p><strong>Type:</strong> {{ recipeData[0].Type }}</p>
                 <p><strong>Text:</strong> {{ recipeData[0].Text }}</p>
                 <p><strong>RecipeID:</strong> {{ recipeData[0].RecipeID }}</p>
-                <p><strong>UserID:</strong> {{ recipeData[0].UserID }}</p>
+                <p><strong>User:</strong> {{ userData[0].Name }}</p>
             </div>
             <div class="col-md-6">
                 <div class="ratings">
@@ -29,7 +29,7 @@
                     {% if ratingData %}
                         <ul class="list-unstyled">
                             {% for rating in ratingData %}
-                                <li>{{ rating.Value }} by {{ rating.UserID }}</li>
+                                <li>{{ rating.Value }} by {{ rating.Name }}</li>
                             {% endfor %}
                         </ul>
                     {% else %}
@@ -69,7 +69,7 @@
                 {% if commentsData %}
                     <ul class="list-unstyled">
                         {% for comment in commentsData %}
-                            <li>{{ comment.Body }} <span class="text-muted">by {{ comment.UserID }}</span></li>
+                            <li>{{ comment.Body }} <span class="text-muted"><br>by {{ comment.Name }}</span></li>
                         {% endfor %}
                     </ul>
                 {% else %}
