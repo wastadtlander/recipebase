@@ -3,6 +3,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.utils import secure_filename
 import mysql.connector
 import uuid
+import bcrypt
 
 from config import config
 
@@ -18,17 +19,21 @@ connection = None
 
 class User(UserMixin):
     # Assuming you have a User class for your user model
-    def __init__(self, id, name, email, user_type):
+    def __init__(self, id, name, email, user_type, password):
         self.id = id
         self.name = name
         self.email = email
         self.user_type = user_type
+        self.password = password
 
     def get_id(self):
         return self.id
     
     def is_admin(self):
         return self.user_type == 'Admin'
+    
+    def check_password(self, password):
+        return bcrypt.checkpw(password.encode('utf-8'), self.password)
 
 def get_db_connection():
     global connection
@@ -597,6 +602,7 @@ def go_to_user_page():
 def login():
     if request.method == 'POST':
         user_email = request.form.get('user_email_form')
+        password = request.form.get('password')
         cursor = connection.cursor(dictionary=True)
         cursor.execute("SELECT * FROM user WHERE Email = %s", (user_email,))
         user = cursor.fetchone()
@@ -605,7 +611,7 @@ def login():
         if user:
             username = user['Name']
             # session['currUser'] = user
-            user_data = User(user['UserID'], user['Name'], user['Email'], user['UserType'])
+            user_data = User(user['UserID'], user['Name'], user['Email'], user['UserType'], user['Password'])
             login_user(user_data)
             loginStatus = f"Login successful. Welcome, {username}!"
         else:
@@ -628,7 +634,7 @@ def load_user(user_id):
         user_data = cursor.fetchone()
         cursor.close()
         if user_data:
-            return User(user_data['UserID'], user_data['Name'], user_data['Email'], user_data['UserType'])
+            return User(user_data['UserID'], user_data['Name'], user_data['Email'], user_data['UserType'], user_data['Password'])
         return None
     else:
         print("Database connection could not be established.")
