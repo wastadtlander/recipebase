@@ -572,17 +572,35 @@ def get_single_recipe_info(connection, recipeID):
 
 
 # Routes for nav bar:
+@app.route("/stats_page")
+def stats_page():
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM User")
+        user_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM User WHERE UserType = 'Admin'")
+        admin_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM Recipe")
+        recipe_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM Comments")
+        comment_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM Rating")
+        rating_count = cursor.fetchone()[0]
+        return render_template("stats.html", user_count=user_count, admin_count=admin_count, recipe_count=recipe_count, comment_count=comment_count, rating_count=rating_count)
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+
 @app.route('/go_to_recipe_page')
 def go_to_recipe_page():
     recipes = get_recipes_from_database()
     return render_template('recipe_page.html', fetchedRecipes=recipes)
 
-
 @app.route('/go_to_index')
 def go_to_index():
     message = check_connection_status()
     return redirect(url_for('index', message=message))
-
 
 @app.route('/go_to_login_page')
 def go_to_login_page():
