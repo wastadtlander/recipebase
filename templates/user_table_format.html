@@ -22,7 +22,13 @@
             <tr>
                 <td>{{ user.Name }}</td>
                 <td>{{ user.Email }}</td>
-                <td>{% if user.ProfilePicture %} {{ user.ProfilePicture }} {% else %} N/A {% endif %}</td>
+                <td>
+                    {% if user.ProfilePicture %}
+                        <img  src="{{ url_for('get_user_image', user_id=user.UserID) }}" alt="profile_picture" class="img-fluid">
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
                 <td>{{ user.UserType }}</td>
                 <td>{{ user.UserID }}</td>
             </tr>

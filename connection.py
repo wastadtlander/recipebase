@@ -18,15 +18,16 @@ connection = None
 
 class User(UserMixin):
     # Assuming you have a User class for your user model
-    def __init__(self, id, name, email, user_type):
+    def __init__(self, id, name, email, user_type, profile_picture):
         self.id = id
         self.name = name
         self.email = email
         self.user_type = user_type
+        self.profile_picture = profile_picture
 
     def get_id(self):
         return self.id
-    
+
     def is_admin(self):
         return self.user_type == 'Admin'
 
@@ -162,10 +163,6 @@ def add_user():
     if request.content_length > app.config['MAX_CONTENT_LENGTH']:
         abort(413)  # Payload Too Large
 
-    if not current_user.is_admin():
-        message = "User is not an admin"
-        return redirect(url_for('index', message=message))
-
     if request.method == 'POST':
         # Get data from form
         name = request.form['name']
@@ -179,8 +176,9 @@ def add_user():
         cursor.close()
 
         email = request.form.get('email', None)  # email can be NULL based on your schema
-        profile_picture = request.files['profile_picture'].read() if 'profile_picture' in request.files else None
-        user_type = request.form['user_type']
+        profile_picture = request.files.get('profile_picture')
+        image_binary = profile_picture.read() if profile_picture and profile_picture.filename != '' else None
+        user_type = "User"
 
         # Generate a UUID for the user_id
         user_id = str(uuid.uuid4())
@@ -191,7 +189,7 @@ def add_user():
             insert_query = (
                 "INSERT INTO User (Name, Email, ProfilePicture, UserType, UserID) VALUES (%s, %s, %s, %s, %s)"
             )
-            data = (name, email, profile_picture, user_type, user_id)
+            data = (name, email, image_binary, user_type, user_id)
 
             try:
                 cursor.execute(insert_query, data)
@@ -291,9 +289,9 @@ def add_comment():
 @app.route('/remove_recipe/<recipe_id>', methods=['POST'])
 @login_required
 def remove_recipe(recipe_id):
-    if not current_user.is_admin():
-        message = "User is not an admin"
-        return redirect(url_for('index', message=message))
+    # if current_user.user_type != 'Admin':
+    #     flash('You do not have permission to remove recipes.')
+    #     return redirect(url_for('go_to_user_page'))
 
     # Assuming you have a connection to your database
     cursor = connection.cursor()
@@ -307,7 +305,10 @@ def remove_recipe(recipe_id):
     finally:
         cursor.close()
 
-    return redirect(url_for('go_to_user_page'))
+    if current_user.is_admin():
+        return redirect(url_for('go_to_admin_page'))
+    else:
+        return redirect(url_for('go_to_user_page'))
 
 @app.route('/remove_comment/<comment_id>', methods=['POST'])
 @login_required
@@ -324,7 +325,10 @@ def remove_comment(comment_id):
     finally:
         cursor.close()
 
-    return redirect(url_for('go_to_user_page'))
+    if current_user.is_admin():
+        return redirect(url_for('go_to_admin_page'))
+    else:
+        return redirect(url_for('go_to_user_page'))
 
 
 @app.route('/get_image/<int:user_id>')
@@ -339,7 +343,7 @@ def get_image(user_id):
         return "No image", 404
 
 
-@app.route('/get_recipe_image/<image_id>')
+@app.route('/get_recipe_image/<image_id>', methods=['GET'])
 def get_recipe_image(image_id):
     conn = get_db_connection()  # Ensure a valid connection
     cursor = conn.cursor()
@@ -395,6 +399,35 @@ def update_user():
         connection.commit()
         message = 'User updated successfully!'
         cursor.close()
+    else:
+        message = "No database connection."
+
+    return redirect(url_for('index', message=message))
+
+
+@app.route('/update_user_role', methods=['POST'])
+def update_user_role():
+    global connection
+    message = ""
+
+    # Get the user name and new role from the form
+    name = request.form['name']
+    new_role = request.form['user_type']
+
+    if connection:
+        cursor = connection.cursor()
+
+        # Update query to change the user's role
+        update_query = "UPDATE user SET UserType = %s WHERE Name = %s"
+        try:
+            cursor.execute(update_query, (new_role, name))
+            connection.commit()
+            message = f"User role updated successfully for {name}!"
+        except mysql.connector.Error as err:
+            print("Error: {}".format(err))
+            message = "Failed to update user role."
+        finally:
+            cursor.close()
     else:
         message = "No database connection."
 
@@ -497,6 +530,25 @@ def get_users_from_database():
     #     return None
 
 
+@app.route('/get_user_image/<user_id>', methods=['GET'])
+def get_user_image(user_id):
+    conn = get_db_connection()  # Ensure a valid connection
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT ProfilePicture FROM user WHERE UserID = %s", (user_id,))
+        row = cursor.fetchone()
+        if row:
+            image = row[0]
+            return app.response_class(image, mimetype='image/png')  # Assuming all images are JPEGs
+        else:
+            return 'Image not found', 404
+    except mysql.connector.Error as err:
+        print("Database error: ", err)
+        return "Database error", 500
+    finally:
+        cursor.close()
+
+
 def get_recipes_from_database():
     if connection:
         cursor = connection.cursor(dictionary=True)
@@ -511,6 +563,21 @@ def get_recipes_from_database():
     else:
         return None
 
+def get_comments_from_database():
+    if connection:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT comments.CommentID, comments.Body, comments.UserID, user.Name, recipe.Title
+            FROM comments
+            JOIN user ON comments.UserID = user.UserID
+            JOIN recipe ON comments.Recipe = recipe.RecipeID
+        """)
+        comments = cursor.fetchall()
+        cursor.close()
+        return comments
+    else:
+        return None
+
 
 # Attempting displayign table on index.html
 @app.route('/update_user_table', methods=['GET'])
@@ -522,7 +589,7 @@ def update_table():
 # Viewing individual recipes and related comments.
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
-    recipeData, commentsData, imageData, ratingData, userData = get_single_recipe_info(connection, recipe_id)
+    recipeData, commentsData, imageData, ratingData,  userData = get_single_recipe_info(connection, recipe_id)
 
     # Calculate average rating
     total_ratings = len(ratingData)
@@ -535,7 +602,7 @@ def view_recipe(recipe_id):
 
 def get_single_recipe_info(connection, recipeID):
     cursor = connection.cursor(dictionary=True)
-    
+
     recipe_query = "SELECT * FROM recipe WHERE RecipeID = %s"
     cursor.execute(recipe_query, (recipeID,))
     recipeInfo = cursor.fetchall()
@@ -624,7 +691,24 @@ def go_to_user_page():
     return render_template('user_page.html', user=current_user, recipes=user_recipes, comments=user_comments)
 
 
-# login as a user via UUID
+@app.route('/go_to_admin_page')
+@login_required
+def go_to_admin_page():
+    if not current_user.is_admin():
+        flash("Access denied: User is not an admin.")
+        return redirect(url_for('index'))
+
+    # Assuming you have functions to get data from each table
+    users = get_users_from_database()
+    recipes = get_recipes_from_database()
+    comments = get_comments_from_database()
+    # Add more as needed
+
+    return render_template('user_page.html',  user=current_user, fetchedUsers=users, recipes=recipes, comments=comments)
+
+
+
+# login as a user via username
 @app.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
@@ -637,7 +721,7 @@ def login():
         if user:
             username = user['Name']
             # session['currUser'] = user
-            user_data = User(user['UserID'], user['Name'], user['Email'], user['UserType'])
+            user_data = User(user['UserID'], user['Name'], user['Email'], user['UserType'], user['ProfilePicture'])
             login_user(user_data)
             loginStatus = f"Login successful. Welcome, {username}!"
         else:
@@ -660,7 +744,7 @@ def load_user(user_id):
         user_data = cursor.fetchone()
         cursor.close()
         if user_data:
-            return User(user_data['UserID'], user_data['Name'], user_data['Email'], user_data['UserType'])
+            return User(user_data['UserID'], user_data['Name'], user_data['Email'], user_data['UserType'], user_data['ProfilePicture'])
         return None
     else:
         print("Database connection could not be established.")
