@@ -26,7 +26,9 @@ class User(UserMixin):
 
     def get_id(self):
         return self.id
-    # pass
+    
+    def is_admin(self):
+        return self.user_type == 'Admin'
 
 def get_db_connection():
     global connection
@@ -90,41 +92,53 @@ def index():
             else:
                 message = "No active connection to close."
 
-        # Delete user functionality
-        elif 'delete_user' in request.form:
-            username = request.form['username']
-            if connection:
-                cursor = connection.cursor()
-
-                sql = "DELETE FROM Comments WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
-                cursor.execute(sql, (username,))
-
-                sql = "DELETE FROM Rating WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
-                cursor.execute(sql, (username,))
-
-                sql = "SELECT RecipeID FROM Recipe WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
-                cursor.execute(sql, (username,))
-                recipe_ids = cursor.fetchall()
-
-                for recipe_id in recipe_ids:
-                    sql = "DELETE FROM RecipeImage WHERE RecipeID = %s"
-                    cursor.execute(sql, (recipe_id[0],))
-
-                    sql = "DELETE FROM Recipe WHERE RecipeID = %s"
-                    cursor.execute(sql, (recipe_id[0],))
-
-                sql = "DELETE FROM User WHERE Name = %s"
-                cursor.execute(sql, (username,))
-
-                connection.commit()
-                cursor.close()
-                message = f"User {username} and related data deleted successfully!"
-            else:
-                message = "No active connection. Can't delete user."
     # fetch users
     users = get_users_from_database()
     connection_status = "Connected" if connection else "Not Connected"
     return render_template('index.html', connection_status=connection_status, message=message, users=users)
+
+@app.route('/delete_user', methods=['POST'])
+@login_required
+def delete_user():
+    global connection
+    message = ""
+
+    if not current_user.is_admin():
+        message = "User is not an admin"
+        return redirect(url_for('index', message=message))
+
+    if request.method == 'POST':
+        username = request.form['username']
+        if connection:
+            cursor = connection.cursor()
+
+            sql = "DELETE FROM Comments WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
+            cursor.execute(sql, (username,))
+
+            sql = "DELETE FROM Rating WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
+            cursor.execute(sql, (username,))
+
+            sql = "SELECT RecipeID FROM Recipe WHERE UserID = (SELECT UserID FROM User WHERE Name = %s)"
+            cursor.execute(sql, (username,))
+            recipe_ids = cursor.fetchall()
+
+            for recipe_id in recipe_ids:
+                sql = "DELETE FROM RecipeImage WHERE RecipeID = %s"
+                cursor.execute(sql, (recipe_id[0],))
+
+                sql = "DELETE FROM Recipe WHERE RecipeID = %s"
+                cursor.execute(sql, (recipe_id[0],))
+
+            sql = "DELETE FROM User WHERE Name = %s"
+            cursor.execute(sql, (username,))
+
+            connection.commit()
+            cursor.close()
+            message = f"User {username} and related data deleted successfully!"
+        else:
+            message = "No active connection. Can't delete user."
+
+    return redirect(url_for('index', message=message))
 
 
 @login_manager.user_loader
@@ -143,6 +157,7 @@ def dashboard():
 def add_user():
     global connection
     message = ""
+    print("adduser")
 
     if request.content_length > app.config['MAX_CONTENT_LENGTH']:
         abort(413)  # Payload Too Large
@@ -150,9 +165,19 @@ def add_user():
     if request.method == 'POST':
         # Get data from form
         name = request.form['name']
+        cursor = connection.cursor()
+        check_name_query = "SELECT COUNT(*) FROM User WHERE LOWER(Name) = %s"
+        cursor.execute(check_name_query, (name.lower(),))
+        result = cursor.fetchone()
+        if result[0]:
+            message = "Username is not unique"
+            return redirect(url_for('index', message=message))
+        cursor.close()
+
         email = request.form.get('email', None)  # email can be NULL based on your schema
-        profile_picture = request.files['profile_picture'].read() if 'profile_picture' in request.files else None
-        user_type = request.form['user_type']
+        profile_picture = request.files.get('profile_picture')
+        image_binary = profile_picture.read() if profile_picture and profile_picture.filename != '' else None
+        user_type = "User"
 
         # Generate a UUID for the user_id
         user_id = str(uuid.uuid4())
@@ -161,9 +186,9 @@ def add_user():
         if connection:
             cursor = connection.cursor()
             insert_query = (
-                "INSERT INTO user (Name, Email, ProfilePicture, UserType, UserID) VALUES (%s, %s, %s, %s, %s)"
+                "INSERT INTO User (Name, Email, ProfilePicture, UserType, UserID) VALUES (%s, %s, %s, %s, %s)"
             )
-            data = (name, email, profile_picture, user_type, user_id)
+            data = (name, email, image_binary, user_type, user_id)
 
             try:
                 cursor.execute(insert_query, data)
@@ -177,8 +202,6 @@ def add_user():
         else:
             message = "No database connection."
 
-    connection_status = "Connected" if connection else "Not Connected"
-    # return render_template('add_user.html', message=message, connection_status=connection_status)
     return redirect(url_for('index', message=message))
 
 # Rating a recipe
@@ -265,9 +288,9 @@ def add_comment():
 @app.route('/remove_recipe/<recipe_id>', methods=['POST'])
 @login_required
 def remove_recipe(recipe_id):
-    # if current_user.user_type != 'Admin':
-    #     flash('You do not have permission to remove recipes.')
-    #     return redirect(url_for('go_to_user_page'))
+    if not current_user.is_admin():
+        message = "User is not an admin"
+        return redirect(url_for('index', message=message))
 
     # Assuming you have a connection to your database
     cursor = connection.cursor()
@@ -276,7 +299,7 @@ def remove_recipe(recipe_id):
         cursor.execute("DELETE FROM recipe WHERE RecipeID = %s", (recipe_id,))
         connection.commit()
         flash('Recipe removed successfully.')
-    except Exception as e:
+    except Exception as ex:
         flash('Error removing recipe: ' + str(e))
     finally:
         cursor.close()
