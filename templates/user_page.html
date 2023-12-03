@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <title>Recipe Management</title>
@@ -14,12 +15,14 @@
         <p><strong>Email:</strong> {{ user.email }}</p>
         <p><strong>User Type:</strong> {{ user.user_type }}</p>
         <p><strong>User ID:</strong> {{ user.id }}</p>
-        {% if user.profile_picture %}
-            <p><strong>Profile Picture:</strong></p>
-            <img src="data:image/jpeg;base64,{{ user.profile_picture | b64encode }}" alt="Profile Picture" class="img-fluid">
-        {% else %}
-            <p>No profile picture available.</p>
-        {% endif %}
+        <p><strong>Profile Picture:</strong></p>
+        <div class="col-md-4 mb-3">
+            {% if user.profile_picture %}
+                <img  src="{{ url_for('get_user_image', user_id=user.id) }}" alt="profile_picture" class="img-fluid">
+            {% else %}
+                <p> No profile picture available.</p>
+            {% endif %}
+        </div>
     </div>
     <div class="container mt-5">
         <h1 class="text-center">Manage Recipes</h1>

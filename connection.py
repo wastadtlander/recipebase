@@ -18,11 +18,12 @@ connection = None
 
 class User(UserMixin):
     # Assuming you have a User class for your user model
-    def __init__(self, id, name, email, user_type):
+    def __init__(self, id, name, email, user_type, profile_picture):
         self.id = id
         self.name = name
         self.email = email
         self.user_type = user_type
+        self.profile_picture = profile_picture
 
     def get_id(self):
         return self.id
@@ -336,7 +337,7 @@ def get_image(user_id):
         return "No image", 404
 
 
-@app.route('/get_recipe_image/<image_id>')
+@app.route('/get_recipe_image/<image_id>', methods=['GET'])
 def get_recipe_image(image_id):
     conn = get_db_connection()  # Ensure a valid connection
     cursor = conn.cursor()
@@ -494,6 +495,26 @@ def get_users_from_database():
     #     return None
 
 
+@app.route('/get_user_image/<user_id>', methods=['GET'])
+def get_user_image(user_id):
+    print("getimage")
+    conn = get_db_connection()  # Ensure a valid connection
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT ProfilePicture FROM user WHERE UserID = %s", (user_id,))
+        row = cursor.fetchone()
+        if row:
+            image = row[0]
+            return app.response_class(image, mimetype='image/png')  # Assuming all images are JPEGs
+        else:
+            return 'Image not found', 404
+    except mysql.connector.Error as err:
+        print("Database error: ", err)
+        return "Database error", 500
+    finally:
+        cursor.close()
+
+
 def get_recipes_from_database():
     if connection:
         cursor = connection.cursor(dictionary=True)
@@ -625,7 +646,7 @@ def load_user(user_id):
         user_data = cursor.fetchone()
         cursor.close()
         if user_data:
-            return User(user_data['UserID'], user_data['Name'], user_data['Email'], user_data['UserType'])
+            return User(user_data['UserID'], user_data['Name'], user_data['Email'], user_data['UserType'], user_data['ProfilePicture'])
         return None
     else:
         print("Database connection could not be established.")
