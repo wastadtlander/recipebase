@@ -546,7 +546,11 @@ def get_user_image(user_id):
 def get_recipes_from_database():
     if connection:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM recipe")
+        cursor.execute("""
+            SELECT recipe.Title, recipe.Type, recipe.Text, recipe.RecipeID, user.Name 
+            FROM recipe
+            JOIN user ON recipe.UserID = user.UserID
+        """)
         recipes = cursor.fetchall()
         cursor.close()
         return recipes
@@ -556,7 +560,12 @@ def get_recipes_from_database():
 def get_comments_from_database():
     if connection:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM comments")
+        cursor.execute("""
+            SELECT comments.CommentID, comments.Body, comments.UserID, user.Name, recipe.Title
+            FROM comments
+            JOIN user ON comments.UserID = user.UserID
+            JOIN recipe ON comments.Recipe = recipe.RecipeID
+        """)
         comments = cursor.fetchall()
         cursor.close()
         return comments
@@ -665,7 +674,7 @@ def go_to_admin_page():
 
 
 
-# login as a user via UUID
+# login as a user via username
 @app.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':

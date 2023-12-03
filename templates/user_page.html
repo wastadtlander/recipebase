@@ -33,7 +33,7 @@
                     <th>Title</th>
                     <th>Type</th>
                     <th>Text</th>
-                    <th>User ID</th>
+                    <th>User name</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -43,7 +43,7 @@
                         <td>{{ recipe.Title }}</td>
                         <td>{{ recipe.Type }}</td>
                         <td>{{ recipe.Text }}</td>
-                        <td>{{ recipe.UserID }}</td>
+                        <td>{{ recipe.Name }}</td>
                         <td>
                             <form action="{{ url_for('remove_recipe', recipe_id=recipe.RecipeID) }}" method="post">
                                 <button type="submit" class="btn btn-danger">Remove</button>
@@ -72,8 +72,8 @@
                     <tr>
                         <td>{{ comment.CommentID }}</td>
                         <td>{{ comment.Body }}</td>
-                        <td>{{ comment.Recipe }}</td>
-                        <td>{{ comment.UserID }}</td>
+                        <td>{{ comment.Title }}</td>
+                        <td>{{ comment.Name }}</td>
                         <td>
                             <form action="{{ url_for('remove_comment', comment_id=comment.CommentID) }}" method="post">
                                 <button type="submit" class="btn btn-danger">Remove</button>

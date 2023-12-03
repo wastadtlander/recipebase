@@ -13,7 +13,7 @@
                 <th scope="col">Type</th>
                 <th scope="col">Text</th>
                 <th scope="col">RecipeID</th>
-                <th scope="col">UserID</th>
+                <th scope="col">User Name</th>
             </tr>
         </thead>
         <tbody>
@@ -30,7 +30,7 @@
                             {% endif %}
                         </td>
                         <td>{{ currRecipe.RecipeID }}</td>
-                        <td>{{ currRecipe.UserID }}</td>
+                        <td>{{ currRecipe.Name }}</td>
                     </tr>
                 {% endfor %}
             {% endif %}
