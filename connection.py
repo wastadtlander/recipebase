@@ -712,9 +712,9 @@ def go_to_admin_page():
 @app.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
-        user_email = request.form.get('user_email_form')
+        user_name = request.form.get('user_name_form')
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM user WHERE Email = %s", (user_email,))
+        cursor.execute("SELECT * FROM user WHERE Name = %s", (user_name,))
         user = cursor.fetchone()
         cursor.close()
 
