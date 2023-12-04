@@ -14,15 +14,14 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarTarget">
                 <div class="navbar-nav">
-                    <a class="nav-link" href="{{ url_for('go_to_index') }}">Edit a User</a>
-                    <a class="nav-link" href="{{ url_for('go_to_recipe_page') }}">Recipe Page</a>
+                    <a class="nav-link" href="{{ url_for('go_to_index') }}">Recipe Page</a>
                     <a class="nav-link" href="{{ url_for('add_recipe') }}">Add New Recipe</a>
                     {% if current_user.is_authenticated %}
                         {% if current_user.is_admin() %}
-                            <a class="nav-link" href="{{ url_for('go_to_admin_page') }}">Welcome, {{ current_user.name }}</a>
                             <a class="nav-link" href="{{ url_for('stats_page') }}">Stats</a>
+                            <a class="nav-link" href="{{ url_for('go_to_admin_page') }}">{{ current_user.name }}</a>
                         {% else %}
-                            <a class="nav-link" href="{{ url_for('go_to_user_page') }}">Welcome, {{ current_user.name }}</a>
+                            <a class="nav-link" href="{{ url_for('go_to_user_page') }}">{{ current_user.name }}</a>
                         {% endif %}
                         <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                     {% else %}
