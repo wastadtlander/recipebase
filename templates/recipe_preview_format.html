@@ -22,8 +22,10 @@
                                         {{ currRecipe.Text }}
                                     {% endif %}
                                 </p>
-                                {% if current_user.is_admin() %}
-                                    <p class="card-text">RecipeID: {{ currRecipe.RecipeID }}</p>
+                                {% if current_user.is_authenticated %}
+                                    {% if current_user.is_admin() %}
+                                        <p class="card-text">RecipeID: {{ currRecipe.RecipeID }}</p>
+                                    {% endif %}
                                 {% endif %}
                                 <p class="card-text">Posted by: {{ currRecipe.Name }}</p>
                             </div>
