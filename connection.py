@@ -71,33 +71,8 @@ def teardown_db(exception=None):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    global connection
-
-    # Catch message passed from add_user route
-    message = request.args.get('message', "")
-
-    if request.method == 'POST':
-        # Check if open_connection button was clicked
-        if 'open_connection' in request.form:
-            connection = create_database_connection()
-            if connection:
-                message = "Connected to the database successfully!"
-            else:
-                message = "Failed to connect to the database."
-
-        # Check if close_connection button was clicked
-        elif 'close_connection' in request.form:
-            if connection:
-                close_database_connection(connection)
-                connection = None
-                message = "Connection closed successfully!"
-            else:
-                message = "No active connection to close."
-
-    # fetch users
-    users = get_users_from_database()
-    connection_status = "Connected" if connection else "Not Connected"
-    return render_template('index.html', connection_status=connection_status, message=message, users=users)
+    recipes = get_recipes_from_database()
+    return render_template('index.html', fetchedRecipes=recipes)
 
 @app.route('/delete_user', methods=['POST'])
 @login_required
@@ -107,7 +82,7 @@ def delete_user():
 
     if not current_user.is_admin():
         message = "User is not an admin"
-        return redirect(url_for('index', message=message))
+        return redirect(url_for('go_to_user_page', message=message))
 
     if request.method == 'POST':
         username = request.form['username']
@@ -140,7 +115,7 @@ def delete_user():
         else:
             message = "No active connection. Can't delete user."
 
-    return redirect(url_for('index', message=message))
+    return redirect(url_for('go_to_user_page', message=message))
 
 
 @login_manager.user_loader
@@ -148,18 +123,16 @@ def load_user(Email):
     # Load user from your database
     return User.query.get(Email)
 
-
 @app.route('/dashboard')
 @login_required
 def dashboard():
     return "Welcome to your dashboard"
 
-
 @app.route('/add_user', methods=['GET', 'POST'])
+@login_required
 def add_user():
     global connection
     message = ""
-    print("add")
 
     if request.content_length > app.config['MAX_CONTENT_LENGTH']:
         abort(413)  # Payload Too Large
@@ -173,7 +146,7 @@ def add_user():
         result = cursor.fetchone()
         if result[0]:
             message = "Username is not unique"
-            return redirect(url_for('index', message=message))
+            return redirect(url_for('login', message=message))
         cursor.close()
 
         email = request.form.get('email', None)  # email can be NULL based on your schema
@@ -208,7 +181,7 @@ def add_user():
         else:
             message = "No database connection."
 
-    return redirect(url_for('index', message=message))
+    return redirect(url_for('login', message=message))
 
 # Rating a recipe
 @app.route('/rate_recipe', methods=['POST'])
@@ -294,10 +267,6 @@ def add_comment():
 @app.route('/remove_recipe/<recipe_id>', methods=['POST'])
 @login_required
 def remove_recipe(recipe_id):
-    # if current_user.user_type != 'Admin':
-    #     flash('You do not have permission to remove recipes.')
-    #     return redirect(url_for('go_to_user_page'))
-
     # Assuming you have a connection to your database
     cursor = connection.cursor()
     try:
@@ -346,7 +315,6 @@ def get_image(user_id):
         return app.response_class(data[0], content_type='image/jpeg')  # you might need to adjust the content type
     else:
         return "No image", 404
-
 
 @app.route('/get_recipe_image/<image_id>', methods=['GET'])
 def get_recipe_image(image_id):
@@ -451,7 +419,7 @@ def update_user_role():
     else:
         message = "No database connection."
 
-    return redirect(url_for('index', message=message))
+    return redirect(url_for('go_to_admin_page', message=message))
 
 
 @app.route('/add_recipe', methods=['GET', 'POST'])
@@ -521,10 +489,9 @@ def add_recipe():
         else:
             flash('Database connection not established.')
 
-        return redirect(url_for('index'))
+        return redirect(url_for('go_to_index'))
     else:
         return render_template('add_new_recipe.html')
-
 
 # grab users for display
 def get_users_from_database():
@@ -537,18 +504,6 @@ def get_users_from_database():
         return users
     else:
         return None
-    # global connection
-    # if not connection:
-    #     connection = create_database_connection()
-    # if connection:
-    #     cursor = connection.cursor(dictionary=True)
-    #     cursor.execute("SELECT * FROM user")
-    #     users = cursor.fetchall()
-    #     cursor.close()
-    #     return users
-    # else:
-    #     return None
-
 
 @app.route('/get_user_image/<user_id>', methods=['GET'])
 def get_user_image(user_id):
@@ -567,7 +522,6 @@ def get_user_image(user_id):
         return "Database error", 500
     finally:
         cursor.close()
-
 
 def get_recipes_from_database():
     if connection:
@@ -598,13 +552,11 @@ def get_comments_from_database():
     else:
         return None
 
-
 # Attempting displayign table on index.html
 @app.route('/update_user_table', methods=['GET'])
 def update_table():
     users = get_users_from_database()
     return render_template('user_table_format.html', fetchedUsers=users)
-
 
 # Viewing individual recipes and related comments.
 @app.route('/view_recipe/<recipe_id>')
@@ -657,7 +609,6 @@ def get_single_recipe_info(connection, recipeID):
 
     return recipeInfo, commentsInfo, imagesInfo, ratingsInfo, userInfo
 
-
 # Routes for nav bar:
 @app.route("/stats_page")
 def stats_page():
@@ -679,15 +630,10 @@ def stats_page():
     finally:
         cursor.close()
 
-@app.route('/go_to_recipe_page')
-def go_to_recipe_page():
-    recipes = get_recipes_from_database()
-    return render_template('recipe_page.html', fetchedRecipes=recipes)
-
 @app.route('/go_to_index')
 def go_to_index():
-    message = check_connection_status()
-    return redirect(url_for('index', message=message))
+    recipes = get_recipes_from_database()
+    return render_template('index.html', fetchedRecipes=recipes)
 
 @app.route('/go_to_login_page')
 def go_to_login_page():
@@ -716,7 +662,7 @@ def go_to_user_page():
 def go_to_admin_page():
     if not current_user.is_admin():
         flash("Access denied: User is not an admin.")
-        return redirect(url_for('index'))
+        return redirect(url_for('user_page'))
 
     # Assuming you have functions to get data from each table
     users = get_users_from_database()
@@ -725,8 +671,6 @@ def go_to_admin_page():
     # Add more as needed
 
     return render_template('user_page.html',  user=current_user, fetchedUsers=users, recipes=recipes, comments=comments)
-
-
 
 # login as a user via username
 @app.route('/login', methods=['POST'])
