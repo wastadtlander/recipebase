@@ -333,48 +333,63 @@ def get_recipe_image(image_id):
         cursor.close()
 
 
+@app.route('/go_to_update_user')
+@login_required
+def go_to_update_user():
+    user_id = current_user.get_id()
+    cursor = connection.cursor(dictionary=True)
+
+    return render_template('update_user.html', user=current_user)
+
+
 @app.route('/update_user', methods=['POST'])
+@login_required
 def update_user():
     global connection
-    message = ""
-    user_id = request.form['user_id']
-    name = request.form['name']
+    user_id = current_user.id
     email = request.form.get('email')
-    profile_picture = request.files['profile_picture']
-    user_type = request.form['user_type']
+    password = request.form.get('password')
+    profile_picture = request.files.get('profile_picture')
+    user_type = request.form.get('user_type')
+
     if connection:
         cursor = connection.cursor()
 
-        placeholders = ["name = %s"]
-        values = [name]
+        update_fields = []
+        values = []
 
-        if email:
-            placeholders.append("Email = %s")
+        if email is not None:  # Including empty string to allow clearing email
+            update_fields.append("Email = %s")
             values.append(email)
+
+        if password:
+            password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+            update_fields.append("Password = %s")
+            values.append(password_hash)
+
+        if profile_picture and profile_picture.filename:
+            profile_picture_content = profile_picture.read()
+            update_fields.append("ProfilePicture = %s")
+            values.append(profile_picture_content)
+
+        if user_type in ['Admin', 'User']:
+            update_fields.append("UserType = %s")
+            values.append(user_type)
+
+        if update_fields:
+            update_query = f"UPDATE user SET {', '.join(update_fields)} WHERE UserID = %s"
+            cursor.execute(update_query, values + [user_id])
+            connection.commit()
+            message = 'User updated successfully!'
         else:
-            placeholders.append("Email = %s")
-            values.append(None)
+            message = 'No updates were provided.'
 
-        if profile_picture:
-            placeholders.append("`ProfilePicture` = %s")
-            values.append(profile_picture.read())
-        else:
-            placeholders.append("`ProfilePicture` = %s")
-            values.append(None)
-
-        placeholders.append("`UserType` = %s")
-        values.append(user_type)
-        placeholders_str = ", ".join(placeholders)
-        update_query = f"UPDATE user SET {placeholders_str} WHERE UserID = %s"
-        cursor.execute(update_query, values + [user_id])
-
-        connection.commit()
-        message = 'User updated successfully!'
         cursor.close()
     else:
         message = "No database connection."
 
-    return redirect(url_for('go_to_admin_page', message=message))
+    flash(message)
+    return redirect(url_for('index'))
 
 
 @app.route('/update_user_role', methods=['POST'])

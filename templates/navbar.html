@@ -23,6 +23,7 @@
                         {% else %}
                             <a class="nav-link" href="{{ url_for('go_to_user_page') }}">{{ current_user.name }}</a>
                         {% endif %}
+                        <a class="nav-link" href="{{ url_for('go_to_update_user') }}">Update User Information</a>
                         <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                     {% else %}
                         <a class="nav-link" href="{{ url_for('go_to_login_page') }}">Login</a>
