@@ -618,11 +618,22 @@ def go_to_user_page():
     cursor = connection.cursor(dictionary=True)
 
     # Query to fetch user's recipes
-    cursor.execute("SELECT * FROM recipe WHERE UserID = %s", (user_id,))
+    cursor.execute("""
+        SELECT recipe.*, user.Name
+        FROM recipe
+        JOIN user ON recipe.UserID = user.UserID
+        WHERE recipe.UserID = %s
+    """, (user_id,))
     user_recipes = cursor.fetchall()
 
     # Query to fetch user's recipes
-    cursor.execute("SELECT * FROM comments WHERE UserID = %s", (user_id,))
+    cursor.execute("""
+        SELECT comments.*, user.Name, recipe.Title
+        FROM comments
+        JOIN user ON comments.UserID = user.UserID
+        JOIN recipe ON comments.Recipe = recipe.RecipeID
+        WHERE comments.UserID = %s
+    """, (user_id,))
     user_comments = cursor.fetchall()
     cursor.close()
 
