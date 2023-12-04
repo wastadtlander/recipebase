@@ -196,7 +196,6 @@ def rate_recipe():
         # Recipe ID
         recipe_id = request.form['recipe_id']
 
-        cursor = connection.cursor()
         if connection:
             cursor = connection.cursor()
             try:
@@ -433,32 +432,6 @@ def add_recipe():
         recipe_id = str(uuid.uuid4())
         user_id = current_user.get_id()
 
-        cursor = connection.cursor()
-        # if connection:
-        #     cursor = connection.cursor()
-        #     insert_query = (
-        #         'INSERT INTO recipe (RecipeID, Title, Type, text, UserID) VALUES (%s, %s, %s, %s, %s)'
-        #     )
-        #     data = (recipe_id, title, recipe_type, text, user_id)
-        #
-        #     try:
-        #         cursor.execute(insert_query, data)
-        #         connection.commit()
-        #         message = "Recipe added successfully!"
-        #     except mysql.connector.Error as err:
-        #         print("Error: {}".format(err))
-        #         message = "Failed to add recipe."
-        #     finally:
-        #         cursor.close()
-        #
-        #     for image in images:
-        #         if image:
-        #             filename = secure_filename(image.filename)
-        #             image_id = str(uuid.uuid4())
-        #             image_path = os.path.join('path/to/save/images', filename)
-        #             image.save(image_path)
-        #             cursor.execute('INSERT INTO recipeimage (ImageID, RecipeID, Image) VALUES (%s, %s, %s)',
-        #                            (image_id, recipe_id, filename))
         if connection:
             cursor = connection.cursor()
             try:
