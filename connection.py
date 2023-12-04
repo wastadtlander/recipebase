@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, g
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
 import mysql.connector
 import uuid
@@ -14,7 +15,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'go_to_login_page'
 connection = None
-
+bcrypt = Bcrypt(app)
 
 class User(UserMixin):
     # Assuming you have a User class for your user model
@@ -180,6 +181,10 @@ def add_user():
         image_binary = profile_picture.read() if profile_picture and profile_picture.filename != '' else None
         user_type = "User"
 
+        # Get and hash password. We will only store the password hash, and not the password in plaintext. This is more secure!
+        password = request.form['password']
+        password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+
         # Generate a UUID for the user_id
         user_id = str(uuid.uuid4())
 
@@ -187,9 +192,9 @@ def add_user():
         if connection:
             cursor = connection.cursor()
             insert_query = (
-                "INSERT INTO User (Name, Email, ProfilePicture, UserType, UserID) VALUES (%s, %s, %s, %s, %s)"
+                "INSERT INTO User (Name, Email, ProfilePicture, UserType, UserID, Password) VALUES (%s, %s, %s, %s, %s, %s)"
             )
-            data = (name, email, image_binary, user_type, user_id)
+            data = (name, email, image_binary, user_type, user_id, password_hash)
 
             try:
                 cursor.execute(insert_query, data)
@@ -718,6 +723,13 @@ def login():
         user = cursor.fetchone()
         cursor.close()
 
+        password = request.form.get('password_form')
+        stored_pass_hash = user['Password']
+        # Fail if the password hash doesn't match
+        if (bcrypt.check_password_hash(stored_pass_hash, password)) == False:
+            loginStatus = "Login failed. Incorrect password."
+            return render_template('login_page.html', login_status=loginStatus)
+
         if user:
             username = user['Name']
             # session['currUser'] = user
@@ -725,7 +737,7 @@ def login():
             login_user(user_data)
             loginStatus = f"Login successful. Welcome, {username}!"
         else:
-            loginStatus = "Login failed. UserID not found."
+            loginStatus = "Login failed. Username or password not found."
 
         return render_template('login_page.html', login_status=loginStatus)
 
