@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <title>Recipe Management</title>
@@ -10,35 +9,42 @@
 <body>
     {% include 'navbar.html' %}
     <div class="container mt-4">
-        <h1>User Information</h1>
-        <p><strong>Name:</strong> {{ user.name }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>User Type:</strong> {{ user.user_type }}</p>
-        <p><strong>User ID:</strong> {{ user.id }}</p>
-        <p><strong>Profile Picture:</strong></p>
-        <div class="col-md-4 mb-3">
-            {% if user.profile_picture %}
-                <img  src="{{ url_for('get_user_image', user_id=user.id) }}" alt="profile_picture" class="img-fluid">
-            {% else %}
-                <p> No profile picture available.</p>
-            {% endif %}
+        <h2 class="mb-4">User Information</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Name:</strong> {{ user.name }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>User Type:</strong> {{ user.user_type }}</p>
+                <p><strong>User ID:</strong> {{ user.id }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Profile Picture:</strong></p>
+                <div class="mb-3">
+                    {% if user.profile_picture %}
+                    <img src="{{ url_for('get_user_image', user_id=user.id) }}" alt="profile_picture"
+                        class="img-fluid">
+                    {% else %}
+                    <p>No profile picture available.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
     <div class="container mt-5">
-        <h1 class="text-center">Manage Recipes</h1>
-        <!-- Display Recipes -->
-        <table class="table table-bordered mt-4">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Text</th>
-                    <th>User name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for recipe in recipes %}
+        <h2 class="mb-4">Manage Recipes</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Text</th>
+                        <th>User name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recipe in recipes %}
                     <tr>
                         <td>{{ recipe.Title }}</td>
                         <td>{{ recipe.Type }}</td>
@@ -50,25 +56,26 @@
                             </form>
                         </td>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="container mt-5">
-        <h1 class="text-center">Manage Comments</h1>
-        <!-- Display Comments -->
-        <table class="table table-bordered mt-4">
-            <thead>
-                <tr>
-                    <th>Comment ID</th>
-                    <th>Text</th>
-                    <th>Recipe</th>
-                    <th>User ID</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for comment in comments %}
+        <h2 class="mb-4">Manage Comments</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Comment ID</th>
+                        <th>Text</th>
+                        <th>Recipe</th>
+                        <th>User ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comment in comments %}
                     <tr>
                         <td>{{ comment.CommentID }}</td>
                         <td>{{ comment.Body }}</td>
@@ -80,38 +87,40 @@
                             </form>
                         </td>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     {% if current_user.is_admin() %}
-    <div class="container my-5">
-        <h2>Delete a User</h2>
-    <form method="post" action="/delete_user" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-            <input type="text" class="form-control" name="username" placeholder="Username">
+    <div class="container mt-5">
+        <h2 class="mb-4">Delete a User</h2>
+        <form method="post" action="/delete_user" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <input type="text" class="form-control" name="username" placeholder="Username">
+            </div>
+            <button name="delete_user" type="submit" class="btn btn-danger">Delete User</button>
+        </form>
+        <br>
+        <h2 class="mb-4">Update User</h2>
+        <form action="/update_user_role" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" class="form-control" name="name" placeholder="User Name">
+            </div>
+            <div class="mb-3">
+                <label for="user_type" class="form-label">User Type:</label>
+                <select class="form-select" name="user_type">
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
+                </select>
+            </div>
+            <input type="submit" class="btn btn-primary" value="Update User Role">
+        </form>
+        <br>
+        <div id="userTableContainer">
+            {% include 'user_table_format.html' %}
         </div>
-        <button name="delete_user" type="submit" class="btn btn-danger">Delete User</button>
-    </form>
-    <br>
-    <h2>Update User</h2>
-    <form action="/update_user_role" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="name" class="form-label">Name:</label>
-            <input type="text" class="form-control" name="name" placeholder="User Name">
-        </div>
-        <div class="mb-3">
-            <label for="user_type" class="form-label">User Type:</label>
-            <select class="form-select" name="user_type">
-                <option value="Admin">Admin</option>
-                <option value="User">User</option>
-            </select>
-        </div>
-        <input type="submit" class="btn btn-primary" value="Update User Role">
-    </form>
-    <br>
-    <div id="userTableContainer">
-        {% include 'user_table_format.html' %}
     </div>
     {% endif %}
     </div>
