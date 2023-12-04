@@ -67,7 +67,6 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Comment ID</th>
                         <th>Text</th>
                         <th>Recipe</th>
                         <th>User ID</th>
@@ -77,7 +76,6 @@
                 <tbody>
                     {% for comment in comments %}
                     <tr>
-                        <td>{{ comment.CommentID }}</td>
                         <td>{{ comment.Body }}</td>
                         <td>{{ comment.Title }}</td>
                         <td>{{ comment.Name }}</td>
