@@ -20,8 +20,10 @@
                 <h1>{{ recipeData[0].Title }}</h1>
                 <p><strong>Type:</strong> {{ recipeData[0].Type }}</p>
                 <p><strong>Text:</strong> {{ recipeData[0].Text }}</p>
-                {% if current_user.is_admin() %}
-                    <p><strong>RecipeID:</strong> {{ recipeData[0].RecipeID }}</p>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin() %}
+                        <p><strong>RecipeID:</strong> {{ recipeData[0].RecipeID }}</p>
+                    {% endif %}
                 {% endif %}
                 <p><strong>User:</strong> {{ userData[0].Name }}</p>
             </div>

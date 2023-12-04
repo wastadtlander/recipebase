@@ -129,7 +129,6 @@ def dashboard():
     return "Welcome to your dashboard"
 
 @app.route('/add_user', methods=['GET', 'POST'])
-@login_required
 def add_user():
     global connection
     message = ""
@@ -666,15 +665,14 @@ def login():
         cursor.execute("SELECT * FROM user WHERE Name = %s", (user_name,))
         user = cursor.fetchone()
         cursor.close()
-
         password = request.form.get('password_form')
-        stored_pass_hash = user['Password']
-        # Fail if the password hash doesn't match
-        if (bcrypt.check_password_hash(stored_pass_hash, password)) == False:
-            loginStatus = "Login failed. Incorrect password."
-            return render_template('login_page.html', login_status=loginStatus)
 
         if user:
+            stored_pass_hash = user['Password']
+            # Fail if the password hash doesn't match
+            if (bcrypt.check_password_hash(stored_pass_hash, password)) == False:
+                loginStatus = "Login failed. Incorrect password."
+                return render_template('login_page.html', login_status=loginStatus)
             username = user['Name']
             # session['currUser'] = user
             user_data = User(user['UserID'], user['Name'], user['Email'], user['UserType'], user['ProfilePicture'])
